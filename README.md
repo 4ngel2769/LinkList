@@ -1,5 +1,6 @@
 <p align="center">
-  <img width="200px" src="https://raw.githubusercontent.com/LinkStackOrg/branding/main/logo/svg/logo_animated.svg"><br>
+  <img width="200px" src="https://raw.githubusercontent.com/4ngel2769/LinkList/main/assets/linklist.png"
+  <br>
   <br>
   <picture>
     <source media="(prefers-color-scheme: dark)" width="400px" srcset="https://raw.githubusercontent.com/LinkStackOrg/branding/main/logo/png/wordmark_light.png">
