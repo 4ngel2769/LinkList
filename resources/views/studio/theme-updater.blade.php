@@ -47,7 +47,7 @@
                                 if (strpos($sourceURL, 'github.com')){
                                 ini_set('user_agent', 'Mozilla/4.0 (compatible; MSIE 6.0)');
                                 try{
-                                    $textGit = file_get_contents($replaced);
+                                    $textGit = external_file_get_contents($replaced);
                                     $patternGit = '/Theme Version:.*/';
                                     preg_match($patternGit, $textGit, $matches, PREG_OFFSET_CAPTURE);
                                     $sourceURLGit = substr($matches[0][0],15);
@@ -82,7 +82,7 @@
                             } } ?>
                 </table>
         </div>
-        <a href="'. url('update/theme') .'" onclick="updateicon()" class="btn btn-gray ms-3 mb-4">
+        <a href="{{ url('update/theme') }}" onclick="updateicon()" class="btn btn-gray ms-3 mb-4">
             <span id="updateicon"><i class="bi bi-arrow-repeat"></i></span> {{__('messages.Update all themes')}}
         </a>
       </div>

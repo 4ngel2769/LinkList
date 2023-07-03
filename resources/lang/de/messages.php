@@ -20,6 +20,14 @@ return [
     'by' => 'von',
 
 
+    'HOME.MESSAGE' => '
+    <p>Nehmen Sie die Kontrolle über Ihre Online-Präsenz mit <a href="https://linkstack.org/"><strong>LinkStack</strong></a>
+    , der datenschutzorientierten, Open-Source <strong>Link-Management-Plattform</strong>. 
+    Erstellen Sie eine anpassbare Profilseite, um <strong> alle Ihre wichtigen Links an einem Ort zu verwalten</strong> 
+    und Ihren Besuchern ein nahtloses Browsing-Erlebnis zu bieten.</p>
+    ',
+
+
     /*
     |--------------------------------------------------------------------------
     | Demo Page/Home Page Example Page
@@ -101,7 +109,7 @@ return [
     'Click' => 'Klicken',
     'here' => 'Hier',
     'to verify the user' => 'um den Benutzer zu verifizieren.',
-    'Manage users' => 'Benutzer verwalten',
+    'Manage Users' => 'Benutzerverwaltung',
 
 
     # Email verification email
@@ -123,7 +131,7 @@ return [
     'Scheme' => 'Farbschema',
     'Auto' => 'Auto',
     'Dark' => 'Dunkel',
-    'Light' => 'Licht',
+    'Light' => 'Hell',
     'Color Customizer' => 'Farbanpassung',
     'Sidebar Color' => 'Farbe der Seitenleiste',
     'Default' => 'Standard',
@@ -154,7 +162,7 @@ return [
     'Administration' => 'Verwaltung',
     'Admin' => 'Administrator',
     'Config' => 'Konfig',
-    'Manage Users' => 'Benutzer verwalten',
+    'Manage Users' => 'Benutzerverwaltung',
     'Footer Pages' => 'Fußzeilen',
     'Site Customization' => 'Seitenanpassung',
     'Site Logo' => 'Site-Logo',
@@ -372,6 +380,7 @@ return [
     'Export all data' => 'Alle Daten exportieren',
     'Export links only' => 'Nur Links exportieren',
     'Import user data' => 'Benutzerdaten importieren',
+    'import.user.alert' => 'Sind Sie sicher, dass Sie diese Datei importieren möchten? Diese Aktion wird alle Ihre aktuellen Daten, einschließlich Links, ersetzen!',
     'Import your user data from another instance' => 'Importieren Sie Ihre Benutzerdaten von einer anderen Instanz.',
     'Import your user data' => 'Importieren Sie Ihre Benutzerdaten von einer anderen Instanz.',
     'Import' => 'Importieren',
@@ -379,6 +388,10 @@ return [
     'You are about to delete' => 'Sie sind dabei, Ihr Konto zu löschen!',
     'You are about to delete This action cannot be undone' => 'Sie sind dabei, Ihr Konto zu löschen! Diese Aktion kann nicht rückgängig gemacht werden.',
     'Delete account' => 'Konto löschen',
+    
+    # Alerts
+    'Profile updated successfully!' => 'Profil erfolgreich aktualisiert!',
+    'An error occurred while updating your profile.' => 'Beim Aktualisieren Ihres Profils ist ein Fehler aufgetreten.',
 
 
     /*
@@ -446,28 +459,6 @@ return [
     */
 
     'Title' => 'Titel',
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | Edit User Page (Admin)
-    |--------------------------------------------------------------------------
-    |
-    | resources/views/panel/edit-user.blade.php
-    |
-    */
-
-    'Edit User' => 'Benutzer bearbeiten',
-    'Email' => 'E-Mail',
-    'Password' => 'Passwort',
-    'Logo' => 'Logo',
-    'Delete' => 'Löschen',
-    'Custom background' => 'Benutzerdefiniertes Hintergrundbild',
-    'No image selected' => 'Kein Bild ausgewählt',
-    'Page URL' => 'Seiten-URL',
-    'Page description' => 'Seitenbeschreibung',
-    'Role' => 'Rolle',
-    'Save' => 'Speichern',
 
 
     /*
@@ -559,7 +550,7 @@ return [
     */
 
     'Advanced Config' => 'Erweiterte Konfiguration',
-    'Take Backup' => 'Machen Sie ein Backup',
+    'Take Backup' => 'Backup',
     'All Backups' => 'Alle Backups',
     'Diagnosis' => 'Diagnose',
 
@@ -574,7 +565,7 @@ return [
     'Application' => 'Anwendung',
     'Panel settings' => 'Panel-Einstellungen',
     'Security' => 'Sicherheit',
-    'Advanced' => 'Erweitert',
+    'Advanced' => 'Expertenoptionen',
     'SMTP' => 'SMTP',
     'Footer links' => 'Fußzeilen-Links',
     'Debug' => 'Debug',
@@ -602,7 +593,7 @@ return [
     'security.risk.1-3' => 'Hier können Sie leicht überprüfen, ob kritische Systemdateien von extern zugänglich sind. Es ist wichtig, dass auf diese Dateien nicht zugegriffen werden kann, da ansonsten Benutzerdaten wie Passwörter durchsickern könnten. Einträge, die mit einem',
     'security.risk.2-3' => 'gekennzeichnet sind, können von extern nicht zugegriffen werden. Einträge, die mit einem',
     'security.risk.3-3' => 'gekennzeichnet sind, können von jedem eingesehen werden und erfordern sofortiges Handeln zum Schutz Ihrer Daten.',
-    'Hover for more' => 'Bewegen Sie den Mauszeiger für mehr',
+    'Hover for more' => 'Mauszeiger über Symbole bewegen.',
     'Write access' => 'Schreibzugriff',
     'Write access.description.1-3' => 'Hier können Sie leicht überprüfen, ob wichtige Systemdateien beschreibbar sind. Dies ist wichtig, damit jede Funktion ordnungsgemäß funktioniert. Einträge, die mit einem',
     'Write access.description.2-3' => 'markiert sind, funktionieren wie erwartet. Einträge, die mit einem',
@@ -630,7 +621,7 @@ return [
     'Port' => 'Port',
     'Username' => 'Nutzername',
     'Encryption type' => 'Verschlüsselungstyp',
-    'From address' => 'Von Adresse',
+    'From address' => 'Absenderadresse',
     'Apply changes' => 'Änderungen übernehmen',
     'Test E-Mail setup:' => 'E-Mail-Setup testen:',
     'Send Test E-Mail' => 'Test-E-Mail senden',
@@ -776,7 +767,7 @@ return [
 
     'Select a database type' => 'Wählen Sie einen Datenbanktyp aus',
     'Under most circumstances, we recommend using SQLite' => 'In den meisten Fällen empfehlen wir die Verwendung von SQLite.',
-    'MySQL requires a separate, empty MySQL database.' => 'MySQL erfordert eine separate, leere MySQL-Datenbank',
+    'MySQL requires a separate, empty MySQL database' => 'MySQL erfordert eine separate, leere MySQL-Datenbank.',
 
     'Database type:' => 'Datenbanktyp:',
     'Database host:' => 'Datenbankhost:',
@@ -831,7 +822,7 @@ return [
     'Success!' => 'Erfolg!',
     'The update was successful' => 'Das Update war erfolgreich, Sie können nun zum Admin-Panel zurückkehren.',
     'View the release notes' => 'Sehen Sie sich die Versionshinweise an',
-    'Run again' => 'Führe es nochmals aus',
+    'Run again' => 'Erneut updaten',
     'Something went wrong with the update' => 'Beim Update ist ein Fehler aufgetreten',
 
     
@@ -848,12 +839,10 @@ return [
     'Backup.title' => 'Sicherung',
 
     'Backup' => 'Backup',
-    'You can back up your entire instance:' => 'Sie können Ihre gesamte Instanz sichern:',
+
     'The backup system won’t save more than two backups at a time' => 'Das Sicherungssystem speichert nicht mehr als zwei Backups.',
     'Backup Instance' => 'Instanz sichern',
-    'All Backups' => 'Alle Backups',
     'Creating backup' => 'Backup wird erstellt',
-    'Success!' => 'Erfolg!',
     'The backup was successful' => 'Die Backup wurde erfolgreich erstellt. Sie können nun zum Administrationsbereich zurückkehren oder alle Ihre Backups anzeigen.',    
 
 
@@ -918,7 +907,7 @@ return [
     'Heading Text:' => 'Überschriftentext:',
 
     'URL' => 'URL',
-    'Show website icon on button' => 'Website-Symbol auf der Schaltfläche anzeigen',
+    'Show website icon on button' => 'Website-Symbol anzeigen',
 
     'Select a predefined site' => 'Wählen Sie eine vordefinierte Site aus',
     'Enter the link URL' => 'Geben Sie die Link-URL ein',
@@ -1019,7 +1008,6 @@ return [
     # Security Risk Notification
     'Your security is at risk!' => 'Ihre Sicherheit ist gefährdet!',
     'Immediate action is required!' => 'Sofortiges Handeln ist erforderlich!',
-    'Your security is at risk!' => 'Ihre Sicherheit ist gefährdet!',
     'security.msg1' => 'Ihre Sicherheit ist gefährdet.',
     'security.msg2' => 'Einige Dateien können von jedem eingesehen werden. Sofortiges Handeln ist erforderlich!',
     'security.msg3' => 'Einige wichtige Dateien sind öffentlich zugänglich und gefährden Ihre Sicherheit. Bitte ergreifen Sie sofort Maßnahmen, um den öffentlichen Zugriff auf diese Dateien zu widerrufen und unbefugten Zugriff auf Ihre sensiblen Informationen zu verhindern.',
@@ -1037,6 +1025,18 @@ return [
     'support.msg5' => 'einen finanziellen Beitrag zu leisten</a>, würde uns selbst ein kleiner Betrag helfen, die Kosten für die Aufrechterhaltung und Verbesserung von Linkstack zu decken.',
     'support.msg6' => 'Vielen Dank für Ihre Unterstützung und dafür, Teil der LinkStack-Community zu sein!',
     
+
+    /*
+    |--------------------------------------------------------------------------
+    | Footer Links
+    |--------------------------------------------------------------------------
+    |
+    */
+
+    'footer.Home' => 'Startseite',
+    'footer.Terms' => 'AGB',
+    'footer.Privacy' => 'Datenschutz',
+    'footer.Contact' => 'Kontakt',
 
     #=============================================================================#
     # Laravel internal translations                                               #

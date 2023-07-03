@@ -19,6 +19,12 @@ return [
     'Made with' => 'Made with',
     'by' => 'by',
 
+    'HOME.MESSAGE' => '
+    <p>Take control of your online presence with&nbsp;<a href="https://linkstack.org/"><strong>LinkStack</strong></a>
+     the privacy-focused, open-source <strong>link management platform</strong>. Create a customizable profile page to manage <strong>
+     all your important links in one convenient location</strong> and give your audience a seamless browsing experience.</p>
+     ',
+
 
     /*
     |--------------------------------------------------------------------------
@@ -101,7 +107,7 @@ return [
     'Click' => 'Click',
     'here' => 'here',
     'to verify the user' => 'to verify the user.',
-    'Manage users' => 'Manage users',
+    'Manage Users' => 'Manage Users',
 
 
     # Email verification email
@@ -127,7 +133,6 @@ return [
     'Color Customizer' => 'Color Customizer',
     'Sidebar Color' => 'Sidebar Color',
     'Default' => 'Default',
-    'Dark' => 'Dark',
     'Color' => 'Color',
     'Transparent' => 'Transparent',
     'Sidebar Types' => 'Sidebar Types',
@@ -151,12 +156,10 @@ return [
     */
 
     'Home' => 'Home',
-    'Dashboard' => 'Dashboard',
     'Add Link' => 'Add Link',
     'Administration' => 'Administration',
     'Admin' => 'Admin',
     'Config' => 'Config',
-    'Manage Users' => 'Manage Users',
     'Footer Pages' => 'Footer Pages',
     'Site Customization' => 'Site Customization',
     'Site Logo' => 'Site logo',
@@ -204,7 +207,6 @@ return [
     'Run updater' => 'Run updater',
     'Update available' => 'Update available',
     'Up to date' => 'Up to date',
-    'Run updater' => 'Run updater',
     'Check again' => 'Check again',
 
     # User section in navbar
@@ -212,7 +214,6 @@ return [
     'Verified user' => 'Verified user',
     'User' => 'User',
     'Profile' => 'Profile',
-    'Settings' => 'Settings',
     'Styling' => 'Styling',
     'Logout' => 'Logout',
 
@@ -239,6 +240,7 @@ return [
     'Top Links:' => 'Top Links:',
     'You haven’t added any links yet' => 'You haven’t added any links yet.',
     'clicks' => 'clicks',
+    'Clicks' => 'Clicks',
     'Site statistics:' => 'Site statistics:',
     'Total links' => 'Total links',
     'Total clicks' => 'Total clicks',
@@ -283,7 +285,6 @@ return [
     'Short Code' => 'Short Code',
     'Regular' => 'Regular',
     'Brands' => 'Brands',
-    'Color' => 'Color',
     'Color name' => 'color_name',
     'Color HEX' => 'Color HEX',
     'Color HEX1' => 'Color HEX',
@@ -325,7 +326,6 @@ return [
     'Add new Link' => 'Add new Link',
     'No Link Added' => 'You haven’t added any links yet.',
     'Download' => 'Download',
-    'Clicks' => 'Clicks',
     'Preview' => ' Preview:',
     'No compatible browser' => 'Your browser isn’t compatible',
     'Page Icons' => 'Page Icons',
@@ -333,7 +333,6 @@ return [
 
     # Tooltips
     'Customize' => 'Customize',
-    'Edit' => 'Edit',
     'Delete' => 'Delete',
     'Clear icon cache' => 'Clear icon cache',
     
@@ -353,7 +352,7 @@ return [
     'Profile Picture' => 'Profile Picture',
     'Page URL' => 'Page URL',
     'Display name' => 'Display name',
-    'Name' => 'Name:',
+    'Name:' => 'Name:',
     'Page Description' => 'Page Description',
     'Show checkmark' => 'Show checkmark',
     'disableverified' => 'You are a verified user. This setting allows you to hide your checkmark on your page.',
@@ -378,12 +377,17 @@ return [
     'Export all data' => 'Export all data',
     'Export links only' => 'Export links only',
     'Import user data' => 'Import user data',
+    'import.user.alert' => 'Are you sure you want to import this file? This action will replace all your current data, including links!',
     'Import your user data from another instance' => 'Import your user data from another instance.',
     'Import' => 'Import',
     'Delete your account' => 'Delete your account',
     'You are about to delete' => 'You are about to delete your account!',
     'You are about to delete This action cannot be undone' => 'You are about to delete your account! This action cannot be undone.',
     'Delete account' => 'Delete account',
+
+    # Alerts
+    'Profile updated successfully!' => 'Profile updated successfully!',
+    'An error occurred while updating your profile.' => 'An error occurred while updating your profile.',
 
 
     /*
@@ -421,10 +425,8 @@ return [
     'Theme name' => 'Theme name:',
     'Update status' => 'Update status:',
     'Version' => 'Version:',
-    'Error' => 'Error!',
+    'Error!' => 'Error!',
     'Update manually' => 'Update manually',
-    'Update available' => 'Update available',
-    'Up to date' => 'Up to date',
     'Update all themes' => 'Update all themes',
 
 
@@ -457,28 +459,6 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Edit User Page (Admin)
-    |--------------------------------------------------------------------------
-    |
-    | resources/views/panel/edit-user.blade.php
-    |
-    */
-
-    'Edit User' => 'Edit User',
-    'Email' => 'Email',
-    'Password' => 'Password',
-    'Logo' => 'Logo',
-    'Delete' => 'Delete',
-    'Custom background' => 'Custom background',
-    'No image selected' => 'No image selected',
-    'Page URL' => 'Page URL',
-    'Page description' => 'Page description',
-    'Role' => 'Role',
-    'Save' => 'Save',
-
-
-    /*
-    |--------------------------------------------------------------------------
     | Links Page (Admin)
     |--------------------------------------------------------------------------
     |
@@ -486,11 +466,7 @@ return [
     |
     */
 
-    'Links' => 'Links',
     'Link' => 'Link',
-    'Title' => 'Title',
-    'Clicks' => 'Clicks',
-    'Back' => 'Back',
 
 
     /*
@@ -515,7 +491,6 @@ return [
     |
     */
 
-    'Delete a theme' => 'Delete a theme',
     'Delete theme' => 'Delete theme',
 
 
@@ -528,15 +503,12 @@ return [
     |
     */
 
-    'Manage Users' => 'Manage Users',
     'Users:' => 'Users:',
     'Search user' => 'Search user',
     'ID' => 'ID',
     'Name' => 'Name',
     'E-Mail' => 'E-Mail',
     'Page' => 'Page',
-    'Links' => 'Links',
-    'Clicks' => 'Clicks',
     'Created at' => 'Created at',
     'Last seen' => 'Last seen',
     'Status' => 'Status',
@@ -574,7 +546,6 @@ return [
     |
     */
 
-    'Config' => 'Config',
     'Advanced Config' => 'Advanced Config',
     'Take Backup' => 'Take Backup',
     'All Backups' => 'All Backups',
@@ -599,7 +570,6 @@ return [
 
     'default' => 'default',
     'Apply' => 'Apply',
-    'Save' => 'Save',
 
     'AC.description' => 'Allows editing the frontend of your site. Amongst other things, this file allows customization of: Home Page, links, titles, Google Analytics and meta tags.',
     'Advanced Configuration file.' => 'Advanced Configuration file.',
@@ -609,7 +579,6 @@ return [
     'You can back up your entire instance:' => 'You can back up your entire instance:',
     'The backup system won’t save more than two backups at a time' => 'The backup system won’t save more than two backups at a time.',
     'Backup Instance' => 'Backup Instance',
-    'All Backups' => 'All Backups',
 
     'wtrue' => 'Everything is working as expected!',
     'wfalse' => 'This file cannot be written to. This may impede proper operation.',
@@ -617,12 +586,10 @@ return [
     'ufalse' => 'Everything is working as expected!',
     'unull' => 'Something went wrong. This might be normal if you’re running behind a proxy or docker container.',
     'Debugging information' => 'Debugging information',
-    'Security' => 'Security',
     'security.risk' => 'Your security is at risk. Some files can be accessed by everyone. Immediate action is required! Click this message to learn more.',
     'security.risk.1-3' => 'Here, you can easily verify if critical system files can be accessed externally. It is important that these files cannot be accessed, otherwise user data like passwords could get leaked. Entries marked with a',
     'security.risk.2-3' => 'cannot be accessed externally, entries marked with a',
     'security.risk.3-3' => 'can be accessed by anyone and require immediate action to protect your data.',
-    'Link' => 'Link',
     'Hover for more' => 'Hover for more',
     'Write access' => 'Write access',
     'Write access.description.1-3' => 'Here, you can easily verify if important system files can be written to. This is important for every function to work properly. Entries marked with a',
@@ -650,7 +617,6 @@ return [
     'Host' => 'Host',
     'Port' => 'Port',
     'Username' => 'Username',
-    'Password' => 'Password',
     'Encryption type' => 'Encryption type',
     'From address' => 'From address',
     'Apply changes' => 'Apply changes',
@@ -677,7 +643,7 @@ return [
     'DISPLAY_CREDIT_FOOTER.title' => 'Display credit in footer',
     'DISPLAY_CREDIT_FOOTER.description' => 'Determines whether the credit notice should be displayed in the footer.',
     'HOME_URL.title' => 'Set user page as Home Page',
-    'HOME_URL.description' => 'Set user page as Home Page',
+    'HOME_URL.description' => 'Set a user page as the home page. This will move the previous home page to example.com/home.',
     'ALLOW_USER_HTML.title' => 'Allow extended syntax in user\'s descriptions',
     'ALLOW_USER_HTML.description' => 'This enables users to use special formatting like headings and links in their page description.<br>This is generally considered safe.',
     'APP_NAME.title' => 'Application title',
@@ -730,8 +696,6 @@ return [
     'USE_THEME_PREVIEW_IFRAME.description' => 'Determines if an internal iframe should be used as the preview for them theme page.',
     'FORCE_ROUTE_HTTPS.title' => 'Redirect all pages to HTTPS',
     'FORCE_ROUTE_HTTPS.description' => 'This option will break your setup when using a reverse proxy.',
-    'DISPLAY_FOOTER_HOME.title' => 'Home footer link',
-    'DISPLAY_FOOTER_HOME.description' => 'Enable Home footer link.',
     'DISPLAY_FOOTER_TERMS.title' => 'Terms footer link',
     'DISPLAY_FOOTER_TERMS.description' => 'Enable Terms footer link.',
     'DISPLAY_FOOTER_PRIVACY.title' => 'Privacy footer link',
@@ -760,10 +724,6 @@ return [
     'ADMIN_EMAIL.description' => 'Used to send notification emails.',
     'HIDE_VERIFICATION_CHECKMARK.title' => 'Hide verification checkmark',
     'HIDE_VERIFICATION_CHECKMARK.description' => 'Hides verification badge displayed on admin and VIP pages.',
-    'HOME_URL.title' => 'Set user page as Home Page',
-    'HOME_URL.description' => 'Set a user page as the home page. This will move the previous home page to example.com/home.',
-    'MAINTENANCE_MODE.title' => 'Enable Maintenance Mode',
-    'MAINTENANCE_MODE.description' => 'Displays a maintenance message on all public pages. This will disable the login pages.',
     'LOCALE.title' => 'App locale',
     'LOCALE.description' => 'Change the language of your application',
 
@@ -804,7 +764,7 @@ return [
 
     'Select a database type' => 'Select a database type',
     'Under most circumstances, we recommend using SQLite' => 'Under most circumstances, we recommend using SQLite.',
-    'MySQL requires a separate, empty MySQL database.' => 'MySQL requires a separate, empty MySQL database',
+    'MySQL requires a separate, empty MySQL database' => 'MySQL requires a separate, empty MySQL database.',
 
     'Database type:' => 'Database type:',
     'Database host:' => 'Database host:',
@@ -848,7 +808,6 @@ return [
     'update.manually' => 'You can update your installation automatically or download the update and install it manually:',
     'update.windows' => 'Windows users can use the alternative updater. This updater won’t create a backup. Use at your own discretion.',
     'Update automatically' => 'Update automatically',
-    'Update manually' => 'Update manually',
 
     'Updating' => 'Updating',
     'Creating backup' => 'Creating backup',
@@ -877,13 +836,6 @@ return [
     # Title Tag
     'Backup.title' => 'Backup',
 
-    'Backup' => 'Backup',
-    'You can back up your entire instance:' => 'You can back up your entire instance:',
-    'The backup system won’t save more than two backups at a time' => 'The backup system won’t save more than two backups at a time.',
-    'Backup Instance' => 'Backup Instance',
-    'All Backups' => 'All Backups',
-    'Creating backup' => 'Creating backup',
-    'Success!' => 'Success!',
     'The backup was successful' => 'The backup was successful, you can now return to the Admin Panel or see all your backups.',
 
 
@@ -947,41 +899,29 @@ return [
 
     'Heading Text:' => 'Heading Text:',
 
-    'Title' => 'Title',
     'URL' => 'URL',
     'Show website icon on button' => 'Show website icon on button',
 
     'Select a predefined site' => 'Select a predefined site',
-    'Custom Title' => 'Custom Title',
-    'Leave blank for default title' => 'Leave blank for default title',
     'Enter the link URL' => 'Enter the link URL',
 
     'Spacing height' => 'Spacing height',
 
     'Phone' => 'Phone',
-    'Custom Title' => 'Custom Title',
-    'Leave blank for default title' => 'Leave blank for default title',
     'Telephone number' => 'Telephone number',
     'Enter your telephone number' => 'Enter your telephone number',
 
     'Text to display' => 'Text to display',
 
     'Vcard' => 'Vcard',
-    'Custom Title' => 'Custom Title',
-    'Leave blank for default title' => 'Leave blank for default title',
-    'Name' => 'Name',
-    'Prefix' => 'Prefix',
     'First Name' => 'First Name',
     'Middle Name' => 'Middle Name',
     'Last Name' => 'Last Name',
     'Suffix' => 'Suffix',
     'Work' => 'Work',
     'Organization' => 'Organization',
-    'Title' => 'Title',
-    'Role' => 'Role',
     'Work URL' => 'Work URL',
     'Emails' => 'Emails',
-    'Email' => 'Email',
     'Enter your personal email' => 'Enter your personal email',
     'Work Email' => 'Work Email',
     'Enter your work email' => 'Enter your work email',
@@ -998,7 +938,6 @@ return [
     'Country' => 'Country',
     'Work Address' => 'Work Address',
 
-    'Title' => 'Title',
     'URL to the video' => 'URL to the video',
 
 
@@ -1032,7 +971,6 @@ return [
     'Share' => 'Share',
     'Copy URL to clipboard' => 'Copy URL to clipboard',
     'URL has been copied to your clipboard!' => 'URL has been copied to your clipboard!',
-    'Verified user' => 'Verified user',
 
 
     /*
@@ -1063,7 +1001,6 @@ return [
     # Security Risk Notification
     'Your security is at risk!' => 'Your security is at risk!',
     'Immediate action is required!' => 'Immediate action is required!',
-    'Your security is at risk!' => 'Your security is at risk!',
     'security.msg1' => 'Your security is at risk.',
     'security.msg2' => 'Some files can be accessed by everyone. Immediate action is required!',
     'security.msg3' => 'Some important files, are publicly accessible, putting your security at risk. Please take immediate action to revoke public access to these files to prevent unauthorized access to your sensitive information.',
@@ -1080,6 +1017,19 @@ return [
     'support.msg4' => 'If you\'re able to',
     'support.msg5' => 'make a financial contribution</a>, even a small amount would help us cover the costs of maintaining and improving Linkstack.',
     'support.msg6' => 'Thank you for your support and for being a part of the LinkStack community!',
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Footer Links
+    |--------------------------------------------------------------------------
+    |
+    */
+
+    'footer.Home' => 'Home',
+    'footer.Terms' => 'Terms',
+    'footer.Privacy' => 'Privacy',
+    'footer.Contact' => 'Contact',
 
 
     #=============================================================================#
