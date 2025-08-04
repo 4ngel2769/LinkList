@@ -157,7 +157,6 @@ input[type=radio] + label {
 
 <?php 
 function toggle($key){
-    $configNames = json_decode(file_get_contents(base_path('config/config-legends.json')));
 	echo '
     <form id="'.$key.'-form" action="'.route('editConfig').'" enctype="multipart/form-data" method="post">
 	<div class="form-group col-lg-8">
@@ -182,7 +181,6 @@ document.getElementById("'.$key.'-form").addEventListener("change", function() {
 
 <?php 
 function toggle2($key){
-    $configNames = json_decode(file_get_contents(base_path('config/config-legends.json')));
 	echo '
     <form id="'.$key.'-form" action="'.route('editConfig').'" enctype="multipart/form-data" method="post">
 	<div class="form-group col-lg-8">
@@ -207,7 +205,6 @@ document.getElementById("'.$key.'-form").addEventListener("change", function() {
 
 <?php 
 function text($key){
-    $configNames = json_decode(file_get_contents(base_path('config/config-legends.json')));
     $configValue = str_replace('"', "", EnvEditor::getKey($key));
 	echo '
     <form id="'.$key.'-form" action="'.route('editConfig').'" enctype="multipart/form-data" method="post">
@@ -274,6 +271,9 @@ foreach($users as $user){if($user->littlelink_name != $configValue2){echo '<opti
 {{toggle('HIDE_VERIFICATION_CHECKMARK')}}
 
 
+{{toggle('ENABLE_REPORT_ICON')}}
+
+
 <a name="Panel-settings"><h2 class="ch2">{{__('messages.Panel settings')}}</h2></a>
 
 {{toggle('NOTIFY_EVENTS')}}
@@ -289,6 +289,9 @@ foreach($users as $user){if($user->littlelink_name != $configValue2){echo '<opti
 
 
 {{toggle('ALLOW_CUSTOM_BACKGROUNDS')}}
+
+
+{{toggle('ENABLE_ADMIN_BAR_USERS')}}
 
 
 <a name="Security"><h2 class="ch2">{{__('messages.Security')}}</h2></a>
@@ -407,7 +410,6 @@ document.getElementById("MAINTENANCE_MODE-form").addEventListener("change", func
 {{text('TITLE_FOOTER_HOME')}}
 
 @php
-    $configNames = json_decode(file_get_contents(base_path('config/config-legends.json')));
     $configValue = str_replace('"', "", EnvEditor::getKey('HOME_FOOTER_LINK'));
 @endphp
     <form id="HOME_FOOTER_LINK-form" action="{{route('editConfig')}}" enctype="multipart/form-data" method="post">

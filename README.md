@@ -31,14 +31,14 @@
 </p>
 
 <p align="center">
-<a href="https://github.com/linkstackorg/linkstack/stargazers"><img alt="GitHub Repo stars" src="https://img.llc.ovh/github/stars/julianprieber/littlelink-custom?label=Star%20the%20project&logo=GitHub"></a>
-<a href="https://mstdn.social/@linkstack"><img alt="Mastodon Follow" src="https://img.llc.ovh/mastodon/follow/110147874401985724?domain=http%3A%2F%2Fmstdn.social&style=social"></a>
-<a href="https://discord.linkstack.org"><img alt="Discord online user count" src="https://img.llc.ovh/discord/955765706111193118?color=4A55CC&label=Discord&logo=Discord&style=flat"></a>
+<a href="https://github.com/linkstackorg/linkstack/stargazers"><img alt="GitHub Repo stars" src="https://img.lss.ovh/github/stars/julianprieber/littlelink-custom?label=Star%20the%20project&logo=GitHub"></a>
+<a href="https://mstdn.social/@linkstack"><img alt="Mastodon Follow" src="https://img.lss.ovh/mastodon/follow/110147874401985724?domain=http%3A%2F%2Fmstdn.social&style=social"></a>
+<a href="https://discord.linkstack.org"><img alt="Discord online user count" src="https://img.lss.ovh/discord/955765706111193118?color=4A55CC&label=Discord&logo=Discord&style=flat"></a>
 </p>
 <p align="center">
-<a href="https://github.com/sponsors/julianprieber"><img alt="GitHub spomsors" src="https://img.llc.ovh/github/sponsors/JulianPrieber?color=BF4B8A&logo=githubsponsors&style=flat&label=Sponsor%20us%20on%20Github"></a>
-<a href="https://patreon.com/julianprieber"><img alt="Patreon" src="https://img.llc.ovh/endpoint.svg?url=https%3A%2F%2Fshieldsio-patreon.vercel.app%2Fapi%3Fusername%3Djulianprieber%26type%3Dpatrons&style=flat&logo=patreon"></a>
-<a href="https://liberapay.com/LittleLink-Custom"><img src="https://img.llc.ovh/liberapay/patrons/LittleLink-Custom?logo=liberapay&label=LiberaPay patrons"></a>
+<a href="https://github.com/sponsors/julianprieber"><img alt="GitHub spomsors" src="https://img.lss.ovh/github/sponsors/JulianPrieber?color=BF4B8A&logo=githubsponsors&style=flat&label=Sponsor%20us%20on%20Github"></a>
+<a href="https://patreon.com/julianprieber"><img alt="Patreon" src="https://img.lss.ovh/endpoint.svg?url=https%3A%2F%2Fshieldsio-patreon.vercel.app%2Fapi%3Fusername%3Djulianprieber%26type%3Dpatrons&style=flat&logo=patreon"></a>
+<a href="https://liberapay.com/LinkStack"><img src="https://img.lss.ovh/liberapay/patrons/LinkStack?logo=liberapay&label=LiberaPay%20patrons"></a>
 </p>
 
 ---
@@ -46,12 +46,13 @@
 <p align="center">
   <a href="https://github.com/linkstackorg/linkstack/releases/latest/download/linkstack.zip"><img src="https://raw.githubusercontent.com/LinkStackOrg/branding/main/badges/png/download_latest.png" alt="Download latest" width="380" ></a>
     <br>
-	<a href="https://github.com/linkstackorg/linkstack/releases"><img alt="GitHub release (latest by date)" src="https://img.llc.ovh/github/v/release/JulianPrieber/LittleLink-Custom?label=Latest%20release"></a>
+	<a href="https://github.com/linkstackorg/linkstack/releases"><img alt="GitHub release (latest by date)" src="https://img.lss.ovh/github/v/release/JulianPrieber/LittleLink-Custom?label=Latest%20release"></a>
 </p>
 
 ---
 
-## Function    
+<a name="Function"></a>
+## Function
 
 LinkStack: The Ultimate Link Management Solution
 
@@ -63,6 +64,7 @@ Additionally, LinkStack allows other users to register and create their own link
 
 <br>
 	    
+<a name="About"></a>
 ## About
 
 With LinkStack, our mission is to provide users with a free and privacy-focused solution for managing and sharing links online. We believe that everyone should have access to a customizable link-sharing platform without sacrificing their privacy and control over their data.
@@ -75,6 +77,7 @@ Our goal is to provide a free version of a link-sharing service, similar to Link
 	    
 <br>
 	    
+<a name="Instances"></a>
 ## Instances
 
 <h3 align="center">Find the right instance for you</h3>
@@ -88,6 +91,7 @@ Our goal is to provide a free version of a link-sharing service, similar to Link
   <a href="https://linkstack.org/instances"><img src="https://raw.githubusercontent.com/LinkStackOrg/branding/main/badges/png/create_account.png" alt="Community instances" width="350" ></a>
 </p>
 	    
+<a name="Themes"></a>
 ## Themes
 
 <h3 align="center">Custom Themes</h3>
@@ -130,10 +134,11 @@ Everything is documented in the dedicated GitHub repository.
 
 [github.com/LinkStackOrg/linkstack-themes/tree/main/contributing](https://github.com/LinkStackOrg/linkstack-themes/tree/main/contributing)
 
+<a name="Installation"></a>
 ## Installation
 
 ### Downloading and installing steps:
-* **[Download](https://github.com/linkstackorg/linkstack/releases)** the latest release of LinkStack and simply place the folder 'littlelink' or the contents of this folder in the root directory of your website.
+* **[Download](https://github.com/linkstackorg/linkstack/releases)** the latest release of LinkStack and simply place the folder 'linkstack' or the contents of this folder in the root directory of your website.
 
 ### That's it! No coding no command line setup just plug and play.
 
@@ -149,6 +154,7 @@ When accessing your instance for the first time, you will be greeted by the firs
 
 <br>
 
+<a name="Docker"></a>
 ## Docker
 
 <p align="center">
@@ -164,7 +170,7 @@ The official docker version of [LinkStack](https://github.com/linkstackorg/links
 
 The docker version of LinkStack retains all the features and customization options of the [original version](https://github.com/linkstackorg/linkstack).
 
-This docker is based on [Alpine Linux](https://www.alpinelinux.org), a Linux distribution designed to be small, simple and secure. The web server is running [Apache2](https://www.apache.org), a free and open-source cross-platform web server software. The docker comes with [PHP 8.0](https://www.php.net/releases/8.0/en.php) for high compatibility and performance.
+This docker is based on [Alpine Linux](https://www.alpinelinux.org), a Linux distribution designed to be small, simple and secure. The web server is running [Apache2](https://www.apache.org), a free and open-source cross-platform web server software. The docker comes with [PHP 8.2](https://www.php.net/releases/8.2/en.php) for high compatibility and performance.
 
 #### Using the docker is as simple as pulling and deploying.
 
@@ -176,6 +182,7 @@ This docker is based on [Alpine Linux](https://www.alpinelinux.org), a Linux dis
 
 <br>
 
+<a name="Updating"></a>
 ## Updating
 
 When a **new version** is released, you will get an update notification on your Admin Panel.
@@ -199,6 +206,9 @@ Before updating, the updater will create a backup. Your instance won’t save mo
 
 If you switched your database to MySQL, your database will not be included in the backup.
 
+The updater may fail without throwing an error and just remain on the current version if there are unmet dependencies. This could include not having the correct version of the dependencies (eg. having php-sqlite3 pointing to php8.3-sqlite3, while LinkStack uses PHP 8.2 and needs php8.2-sqlite3). To troubleshoot, update manually and check the errors thown by the instance when accessing the website, as well as the PHP version reported.
+
+<a name="Discord"></a>
 ## Discord
 
 <br>
@@ -209,9 +219,10 @@ If you switched your database to MySQL, your database will not be included in th
 
 <br>
 
+<a name="License"></a>
 ## License
 
-[![License: AGPL v3](https://img.llc.ovh/badge/License-AGPL%20v3-blue.svg)](https://www.gnu.org/licenses/agpl-3.0)
+[![License: AGPL v3](https://img.lss.ovh/badge/License-AGPL%20v3-blue.svg)](https://www.gnu.org/licenses/agpl-3.0)
 
 As of version 4.0.0, the license for this project has been updated to the GNU Affero General Public License v3.0, which explicitly requires that any modifications made to the project must be made public. This license also requires that a copyright notice and license notice be included in any copies or derivative works of the project.
 
@@ -223,6 +234,7 @@ Finally, any derivative works of the project must be licensed under the same lic
 
 <br>
 
+<a name="Supporters"></a>
 ## Supporters
 You can support LinkStack [here](https://linkstack.org/sponsor).
 
@@ -279,6 +291,7 @@ Thank you for all your efforts!
 
 <br>
 
+<a name="Additional-credit"></a>
 ## Additional-credit
 
 - [laravel](https://github.com/laravel/laravel)
@@ -289,7 +302,6 @@ Thank you for all your efforts!
 - [config editor](https://github.com/GeoSot/Laravel-EnvEditor)
 - [text editor (admin)](https://github.com/ckeditor/ckeditor4)
 - [text editor (user)](https://github.com/ckeditor/ckeditor5)
-- [updater backend](https://github.com/codedge/laravel-selfupdater)
 - [backup backend](https://github.com/spatie/laravel-backup)
 - [Vcard backend](https://github.com/jeroendesloovere/vcard)
 - [QR code backend](https://github.com/Bacon/BaconQrCode)

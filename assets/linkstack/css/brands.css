@@ -56,15 +56,17 @@
 button {
   display: inline-block;
   text-decoration: none;
-  height: 48px;
+  height: 100%;
   text-align: center;
   vertical-align: middle;
   font-size: 18px;
   width: 300px;
   font-weight: 700;
-  line-height: 48px;
+  line-height: 20px;
+  padding: 14px 12px 12px 12px;
   letter-spacing: 0.1px;
   white-space: wrap;
+  outline: none;
   border-radius: 8px;
   cursor: pointer;
  }
@@ -72,7 +74,8 @@ button:hover,
 .button:focus {
   color: #333;
   border-color: #888;
-  outline: 0; }
+  outline: 0; 
+}
 .button.button-primary {
   color: #FFF;
   filter: brightness(90%) }
@@ -241,6 +244,20 @@ button:hover,
   filter: brightness(90%);
 }
 
+/* Behance */
+.button.button-behance {
+  color: #ffffff;
+  background-color: linear-gradient(
+    to bottom,
+    #0596E9,
+    #1758D0
+  );
+}
+.button.button-behance:hover,
+.button.button-behance:focus {
+  filter: brightness(90%);
+}
+
 /* BookWyrm */
 .button.button-bookwyrm {
   color: #000000;
@@ -251,6 +268,27 @@ button:hover,
 }
 .button.button-bookwyrm:hover,
 .button.button-bookwyrm:focus {
+  filter: brightness(90%);
+}
+
+/* Booth */
+.button.button-booth {
+  color: #FFFFFF;
+  background-color: #FC4D50;
+}
+.button.button-booth:hover,
+.button.button-booth:focus {
+  filter: brightness(90%);
+}
+
+/* Bluesky */
+.button.button-bluesky {
+  color: #000000;
+  background-color: #F3F9FF;
+  border: 1px solid #212121;
+}
+.button.button-bluesky:hover,
+.button.button-bluesky:focus {
   filter: brightness(90%);
 }
 
@@ -430,6 +468,23 @@ button:hover,
   filter: brightness(90%);
 }
 
+/* Firefish */
+.button.button-firefish {
+  color: #fff;
+  background-image: linear-gradient(
+    45deg,
+    #DB44DB,
+    1%,
+    #EC476D,
+    80%,
+    #F6AE4A
+  );
+}
+.button.button-firefish:hover,
+.button.button-firefish:focus {
+  filter: brightness(90%);
+}
+
 /* Firefox */
 .button.button-firefox {
   color: #FFFFFF;
@@ -448,6 +503,16 @@ button:hover,
 }
 .button.button-flickr:hover,
 .button.button-flickr:focus {
+  filter: brightness(90%);
+}
+
+/* Friendi.ca */
+.button.button-friendica {
+  color: #ffffff;
+  background-color: #5385c1;
+}
+.button.button-friendica:hover,
+.button.button-friendica:focus {
   filter: brightness(90%);
 }
 
@@ -474,6 +539,16 @@ button:hover,
 }
 .button.button-f-droid:hover,
 .button.button-f-droid:focus {
+  filter: brightness(90%);
+}
+
+/* FurAffinity */
+.button.button-furaffinity {
+  color: #FFFFFF;
+  background-color: #FAAF3A;
+}
+.button.button-furaffinity:hover,
+.button.button-furaffinity:focus {
   filter: brightness(90%);
 }
 
@@ -507,6 +582,16 @@ button:hover,
   filter: brightness(90%);
 }
 
+/* Google Drive */
+.button.button-gdrive {
+  color: #FFFFFF;
+  background-color: #1A73E8;
+}
+.button.button-gdrive:hover,
+.button.button-gdrive:focus {
+  filter: brightness(90%);
+}
+
 /* Google Play Store */
 .button.button-playstore {
   color: #FFFFFF;
@@ -514,6 +599,16 @@ button:hover,
 }
 .button.button-playstore:hover,
 .button.button-playstore:focus {
+  filter: brightness(90%);
+}
+
+/* HearThis.at */
+.button.button-hearthisat {
+  color: #FFFFFF;
+  background-color: #000000;
+}
+.button.button-hearthisat:hover,
+.button.button-hearthisat:focus {
   filter: brightness(90%);
 }
 
@@ -539,6 +634,16 @@ button:hover,
 }
 .button.button-instagram:hover,
 .button.button-instagram:focus {
+  filter: brightness(90%);
+}
+
+/* Itaku */
+.button.button-itaku {
+  color: #000;
+  background-color: #ffeb3b;
+}
+.button.button-itaku:hover,
+.button.button-itaku:focus {
   filter: brightness(90%);
 }
 
@@ -579,6 +684,16 @@ button:hover,
 }
 .button.button-ko-fi:hover,
 .button.button-ko-fi:focus {
+  filter: brightness(90%);
+}
+
+/* last.fm */
+.button.button-last-fm {
+  color: #ffffff;
+  background-color: #b90000;
+}
+.button.button-last-fm:hover,
+.button.button-last-fm:focus {
   filter: brightness(90%);
 }
 
@@ -756,6 +871,16 @@ button:hover,
   filter: brightness(90%);
 }
 
+/* Picarto */
+.button.button-picarto {
+  color: #ffffff;
+  background-color: #4aba8a;
+}
+.button.button-picarto:hover,
+.button.button-picarto:focus {
+  filter: brightness(90%);
+}
+
 /* Pinterest */
 .button.button-pinterest {
   color: #000000;
@@ -793,13 +918,13 @@ button:hover,
   filter: brightness(90%);
 }
 
-/* Plemora */
-.button.button-plemora {
+/* Pleroma */
+.button.button-pleroma {
   color: #FFFFFF;
   background-color: #0f161e;
 }
-.button.button-plemora:hover,
-.button.button-plemora:focus {
+.button.button-pleroma:hover,
+.button.button-pleroma:focus {
   filter: brightness(90%);
 }
 
@@ -813,6 +938,16 @@ button:hover,
 }
 .button.button-producthunt:hover,
 .button.button-producthunt:focus {
+  filter: brightness(90%);
+}
+
+/* PronounsPage */
+.button.button-pronounspage {
+  color: #ffffff;
+  background-color: #c71585;
+}
+.button.button-pronounspage:hover,
+.button.button-pronounspage:focus {
   filter: brightness(90%);
 }
 
@@ -853,6 +988,16 @@ button.button-scribd{
 }
 .button.button-signal:hover,
 .button.button-signal:focus {
+  filter: brightness(90%);
+}
+
+/* Simplex */
+.button.button-simplex {
+  color: #ffffff;
+  background-color: #0e2b57;
+}
+.button.button-simplex:hover,
+.button.button-simplex:focus {
   filter: brightness(90%);
 }
 
@@ -916,6 +1061,16 @@ button.button-scribd{
   filter: brightness(90%);
 }
 
+/* Streams */
+.button.button-streams {
+  color: #0000FF;
+  background-color: #FFFFFF;
+}
+.button.button-streams:hover,
+.button.button-streams:focus {
+  filter: brightness(90%);
+}
+
 /* Telegram */
 .button.button-telegram {
   color: #FFFFFF;
@@ -936,6 +1091,16 @@ button.button-scribd{
   filter: brightness(90%);
 }
 
+/* Throne */
+.button.button-throne {
+  color: #FFFFFF;
+  background-color: #805AD5;
+}
+.button.button-throne:hover,
+.button.button-throne:focus {
+  filter: brightness(90%);
+}
+
 /* TikTok */
 .button.button-tiktok {
   color: #FFFFFF;
@@ -944,6 +1109,25 @@ button.button-scribd{
 .button.button-tiktok:hover,
 .button.button-tiktok:focus {
   filter: brightness(90%);
+}
+
+/* Trakt */
+.button.button-trakt {
+  color: white;
+  background: radial-gradient(
+    farthest-corner at 0% 100%, 
+    rgb(245, 6, 19) 0%, 
+    rgb(225, 20, 60) 10%, 
+    rgb(207, 32, 97) 18%, 
+    rgb(192, 43, 129) 27%, 
+    rgb(180, 51, 154) 36%, 
+    rgb(170, 57, 173) 47%, 
+    rgb(164, 62, 187) 58%, 
+    rgb(160, 65, 195) 73%, 
+    rgb(159, 66, 198) 100%
+    );
+  background-size: 400% 200%;
+  background-position: left bottom;
 }
 
 /* Trello */
@@ -979,7 +1163,7 @@ button.button-scribd{
 /* Twitter */
 .button.button-twitter {
   color: #FFFFFF;
-  background-color: #1DA1F2;
+  background-color: #000000; 
 }
 .button.button-twitter:hover,
 .button.button-twitter:focus {
@@ -1122,5 +1306,24 @@ button.button-scribd{
 }
 .button.button-linkstack:hover,
 .button.button-linkstack:focus {
+  filter: brightness(90%);
+}
+/* Xbox */
+.button.button-xbox {
+  color: #FFFFFF;
+  background-color:  #0e7a0d
+  ;
+}
+.button.button-xbox:hover,
+.button.button-xbox:focus {
+  filter: brightness(90%);
+}
+/* Threads */
+.button.button-threads {
+  color: #FFFFFF;
+  background-color:  #000000;
+}
+.button.button-threads:hover,
+.button.button-threads:focus {
   filter: brightness(90%);
 }

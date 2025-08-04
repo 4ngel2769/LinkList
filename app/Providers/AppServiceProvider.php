@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\View;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -37,5 +38,10 @@ class AppServiceProvider extends ServiceProvider
 
             return $query->count() === 0;
         });
+        Validator::extend('exturl', function ($attribute, $value, $parameters, $validator) {
+            $allowed_schemes = ['http', 'https', 'mailto', 'tel'];
+            return in_array(parse_url($value, PHP_URL_SCHEME), $allowed_schemes, true);
+        });
+        View::addNamespace('blocks', base_path('blocks'));
     }
 }

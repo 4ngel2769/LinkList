@@ -361,6 +361,8 @@ return [
     'disableverified' => 'Sie sind ein verifizierter Benutzer. Mit dieser Einstellung können Sie Ihr Häkchen auf Ihrer Seite ausblenden.',
     'Show share button' => 'Teilen-Button anzeigen',
     'disablesharebutton' => 'Mit dieser Einstellung können Sie die Schaltfläche „Teilen“ auf Ihrer Seite ausblenden.',
+    'Open links in new tab' => 'Links in neuem Tab öffnen',
+    'openlinksnewtab' => 'Diese Einstellung bestimmt, ob Ihre Links auf Ihrer Seite im gleichen oder einem neuen Tab geöffnet werden.',
 
 
     /*
@@ -392,6 +394,12 @@ return [
     # Alerts
     'Profile updated successfully!' => 'Profil erfolgreich aktualisiert!',
     'An error occurred while updating your profile.' => 'Beim Aktualisieren Ihres Profils ist ein Fehler aufgetreten.',
+    
+    'That handle has already been taken' => 'Dieser Name ist bereits vergeben.',
+    'The selected file must be an image' => 'Die ausgewählte Datei muss ein Bild sein.',
+    'The image must be' => 'Unterstützte Formate:',
+    'The image size should not exceed 2MB' => 'Die Bildgröße darf 2 MB nicht überschreiten.',
+    'Please select an image' => 'Bitte wählen Sie ein Bild aus.',
 
 
     /*
@@ -429,7 +437,7 @@ return [
     'Theme name' => 'Themenname:',
     'Update status' => 'Update Status:',
     'Version' => 'Ausführung:',
-    'Error' => 'Fehler',
+    'Error!' => 'Fehler!',
     'Update manually' => 'Manuell aktualisieren',
     'Update all themes' => 'Aktualisieren Sie alle Themen',
 
@@ -524,6 +532,7 @@ return [
 
     # Tooltips
     'tt.Delete' => 'Löschen',
+    'tt.Impersonate' => 'Benutzer nachahmen',
     'tt.Edit' => 'Bearbeiten',
     'tt.All links' => 'Alle Links',
 
@@ -691,6 +700,8 @@ return [
     'FORCE_HTTPS.description' => 'Stellt sicher, dass alle Links standardmäßig HTTPS verwenden. Es wird empfohlen, diese Option zu aktivieren, wenn Sie einen Reverse-Proxy verwenden.',
     'ALLOW_CUSTOM_CODE_IN_THEMES.title' => 'Benutzerdefinierten Code in Themes zulassen',
     'ALLOW_CUSTOM_CODE_IN_THEMES.description' => 'Ermöglicht die Verwendung von benutzerdefiniertem Code in Themes. Wenn Sie Themes aus unbekannten Quellen verwenden, kann dies ein Sicherheitsrisiko darstellen.',
+    'ENABLE_ADMIN_BAR_USERS.title' => 'Aktivieren Sie die Adminleiste für alle Benutzer',
+    'ENABLE_ADMIN_BAR_USERS.description' => 'Wenn aktiviert, wird die Adminleiste für alle authentifizierten Benutzer auf ihrer Linkseite angezeigt.',
     'ENABLE_THEME_UPDATER.title' => 'Aktivieren Sie den Theme-Updater',
     'ENABLE_THEME_UPDATER.description' => 'Legt fest, ob der Theme-Updater aktiv sein soll.',
     'ENABLE_SOCIAL_LOGIN.title' => 'Aktivieren Sie Social Login',
@@ -727,6 +738,8 @@ return [
     'ADMIN_EMAIL.description' => 'Wird zum Versenden von Benachrichtigungs-E-Mails verwendet.',
     'HIDE_VERIFICATION_CHECKMARK.title' => 'Verifizierungshäkchen ausblenden',
     'HIDE_VERIFICATION_CHECKMARK.description' => 'Versteckt das Verifizierungsabzeichen, das auf Admin- und VIP-Seiten angezeigt wird.',
+    'ENABLE_REPORT_ICON.title' => 'Report-Icon aktivieren',
+    'ENABLE_REPORT_ICON.description' => 'Zeigt ein Symbol auf Benutzerseiten an, das es Benutzern ermöglicht, Seiten zu melden.',
     'LOCALE.title' => 'App Lokalisierung',
     'LOCALE.description' => 'Ändern Sie die Sprache Ihrer Anwendung.',
 
@@ -751,8 +764,10 @@ return [
     'Create the admin user' => '3. Erstellen Sie den Admin-Benutzer',
     'Configure the app' => '4. Konfigurieren Sie die App',
     'Choose a language' => 'Wählen Sie eine Sprache',
+    'setup.disclaimer' => 'Es gelten unsere',
+    'Terms and Conditions' => 'Allgemeinen Geschäftsbedingungen',
 
-    'Next' => 'Nächste',
+    'Next' => 'Weiter',
     'Yes' => 'Ja',
     'No' => 'NEIN',
     'Finish setup' => 'Beenden Sie die Einrichtung',
@@ -779,7 +794,7 @@ return [
     'Create an admin account' => 'Erstellen Sie ein Administratorkonto.',
     'Admin email:' => 'Admin-E-Mail:',
     'Admin password:' => 'Administrator-Passwort:',
-    'Handle:' => 'Handhaben:',
+    'Handle:' => 'Handle:',
     'Name:' => 'Name:',
 
     'Configure your page' => 'Konfigurieren Sie Ihre Seite',
@@ -823,6 +838,7 @@ return [
     'The update was successful' => 'Das Update war erfolgreich, Sie können nun zum Admin-Panel zurückkehren.',
     'View the release notes' => 'Sehen Sie sich die Versionshinweise an',
     'Run again' => 'Erneut updaten',
+    'Error' => 'Error',
     'Something went wrong with the update' => 'Beim Update ist ein Fehler aufgetreten',
 
     
@@ -979,6 +995,12 @@ return [
     'Copy URL to clipboard' => 'URL in die Zwischenablage kopieren',
     'URL has been copied to your clipboard!' => 'Die URL wurde in Ihre Zwischenablage kopiert!',
 
+    'Delete User' => 'Benutzer löschen',
+    'Block User' => 'Benutzer blockieren',
+    'Users Theme' => 'Theme',
+    'Search User' => 'Nach Benutzer Suchen',
+    
+    'Edit my profile' => 'Profil editieren',
 
     /*
     |--------------------------------------------------------------------------
@@ -1037,6 +1059,52 @@ return [
     'footer.Terms' => 'AGB',
     'footer.Privacy' => 'Datenschutz',
     'footer.Contact' => 'Kontakt',
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Report Page
+    |--------------------------------------------------------------------------
+    |
+    */
+
+    'report_violation' => 'Verstoß melden',
+    'url_label' => 'URL der gemeldeten Website',
+    'report_type_label' => 'Art des Reports',
+    'hate_speech' => 'Hassrede oder Belästigung',
+    'violence_threats' => 'Gewalt oder Drohungen',
+    'illegal_activities' => 'Illegale Aktivitäten',
+    'copyright_infringement' => 'Verletzung von Urheberrechten',
+    'misinformation_fake_news' => 'Fehlinformationen oder Fake News',
+    'identity_theft' => 'Identitätsdiebstahl',
+    'drug_related_content' => 'Inhalte im Zusammenhang mit Drogen',
+    'weapons_harmful_objects' => 'Waffen oder schädliche Objekte',
+    'child_exploitation' => 'Kindesausbeutung',
+    'fraud_scams' => 'Betrug oder Betrugsversuche',
+    'privacy_violation' => 'Verletzung der Privatsphäre',
+    'impersonation' => 'Identitätswechsel',
+    'other_specify' => 'Sonstiges (bitte angeben)',
+    'additional_comments_label' => 'Zusätzliche Kommentare',
+    'submit_button' => 'Absenden',
+    
+    'report_mail_admin_subject' => 'Profil-Report',
+    'report_mail_admin_report' => 'Ein Profil wurde gemeldet',
+    
+    'report_mail_reported_profile' => 'Gemeldetes Profil',
+    'report_mail_reported_url' => 'Gemeldete URL',
+    'report_mail_type' => 'Art',
+    'report_mail_message' => 'Nachricht',
+    
+    'report_mail_report_submitted_by' => 'Report eingereicht von',
+    'report_mail_reported_by' => 'Gemeldet von',
+    'report_mail_profile' => 'Profil',
+    
+    'report_mail_button_profile' => 'Auf Benutzerseite anzeigen',
+    'report_mail_button_delete' => 'Gemeldeten Benutzer löschen',
+    
+    'report_error' => 'Profil konnte nicht gemeldet werden',
+    'report_success' => 'Profil wurde erfolgreich gemeldet',
+
 
     #=============================================================================#
     # Laravel internal translations                                               #

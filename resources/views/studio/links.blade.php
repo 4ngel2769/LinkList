@@ -45,7 +45,7 @@ if (isset($_COOKIE['LinkCount'])) {
 @include('components.favicon')
 @include('components.favicon-extension')
 
-<?php function strp($urlStrp){return str_replace(array('http://', 'https://'), '', $urlStrp);} ?>
+<?php if(!function_exists('strp')){function strp($urlStrp){return str_replace(array('http://', 'https://'), '', $urlStrp);}} ?>
 
 <div class="conatiner-fluid content-inner mt-n5 py-0">
     <div class="row">   
@@ -77,7 +77,7 @@ if (isset($_COOKIE['LinkCount'])) {
                                         @foreach($links as $link)
                                         @php $button = Button::find($link->button_id); if(isset($button->name)){$buttonName = $button->name;}else{$buttonName = 0;} @endphp
                                         @php if($buttonName == "default email"){$buttonName = "email";} if($buttonName == "default email_alt"){$buttonName = "email_alt";} @endphp
-                                        @if($button->name !== 'icon')
+                                        @if($button && $button->name !== 'icon')
                                         <div class='row h-100 pb-0 mb-2 border rounded hvr-glow w-100' data-id="{{$link->id}}">
                                             <div class="d-flex ">
                             
@@ -101,8 +101,8 @@ if (isset($_COOKIE['LinkCount'])) {
                                                             <span class="bg-soft-secondary" style="border: 1px solid #d0d4d7 !important;border-radius:5px;width:25px!important;height:25px!important;"><i style="margin-left:2.83px;margin-right:-1px;color:#fff;" class='bi bi-card-heading'>&nbsp;</i></span>
                                                             @elseif($button->name == "text")
                                                             <span class="bg-soft-secondary" style="border: 1px solid #d0d4d7 !important;border-radius:5px;width:25px!important;height:25px!important;"><i style="margin-left:2.83px;margin-right:-1px;color:#fff;" class='bi bi-fonts'>&nbsp;</i></span>
-                                                            @elseif($button->name == "buy me a coffee")
-                                                            <span class="bg-soft-secondary" style="border: 1px solid #d0d4d7 !important;border-radius:5px;width:25px!important;height:25px!important;"><img style="margin-left:6px!important;margin-right:6px!important;" alt="button-icon" height="15" class="m-1 " src="{{ asset('\/assets/linkstack/icons\/') . "coffee" }}.svg "></span>
+                                                            @elseif($link->custom_icon && $link->type && $link->type !== 'predefined')
+                                                            <span class="bg-soft-secondary" style="border: 1px solid #d0d4d7 !important;border-radius:5px;width:25px!important;height:25px!important;"><i style="width:20px;margin:1px;color:#fff;" class='fa {{$link->custom_icon}}'>&nbsp;</i></span>
                                                             @else
                                                             <span class="bg-soft-secondary" style="border: 1px solid #d0d4d7 !important;border-radius:5px;width:25px!important;height:25px!important;"><img style="max-width:15px !important;" alt="button-icon" height="15" class="m-1 " src="{{ asset('\/assets/linkstack/icons\/') . $buttonName }}.svg "></span>
                                                             @endif
@@ -164,7 +164,7 @@ if (isset($_COOKIE['LinkCount'])) {
                                                             </a>
 
                                                             @if(env('ENABLE_BUTTON_EDITOR') === true)
-                                                            @if($link->button_id == '1' or $link->button_id == '2')
+                                                            @if(($link->button_id == '1' || $link->button_id == '2') && $link->type == 'link')
                                                                 <a style="float: right;" href="{{ route('editCSS', $link->id ) }}" class="btn btn-sm me-1 btn-icon btn-success" data-bs-toggle="tooltip" data-bs-placement="top" aria-label="Add" data-bs-placement="top" data-original-title="{{__('messages.Customize')}}">
                                                                     <span class="btn-inner">
                                                                         <svg class="icon-20" width="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="currentColor">
@@ -227,42 +227,63 @@ if (isset($_COOKIE['LinkCount'])) {
                                 @csrf
                                 <div class="form-group col-lg-8">
                             
-                                        @php
-                                        function iconLink($icon){
-                                        $iconLink = DB::table('links')
-                                        ->where('user_id', Auth::id())
-                                        ->where('title', $icon)
-                                        ->where('button_id', 94)
-                                        ->value('link');
-                                          if (is_null($iconLink)){
-                                               return false;
-                                          } else {
-                                                return $iconLink;}}
-                                        function searchIcon($icon)
-                                    {$iconId = DB::table('links')
-                                        ->where('user_id', Auth::id())
-                                        ->where('title', $icon)
-                                        ->where('button_id', 94)
-                                        ->value('id');
-                                    if(is_null($iconId)){return false;}else{return $iconId;}}
-                                        function iconclicks($icon){
-                                        $iconClicks = searchIcon($icon);
-                                        $iconClicks = DB::table('links')->where('id', $iconClicks)->value('click_number');
-                                          if (is_null($iconClicks)){return 0;}
-                                          else {return $iconClicks;}}
-                            
-                                          function icon($name, $label) {
-                                              echo '<div class="mb-3">
-                                                      <label class="form-label">'.$label.'</label>
-                                                      <span class="form-text" style="font-size: 90%; font-style: italic;">'.__('messages.Clicks').': '.iconclicks($name).'</span>
-                                                      <div class="input-group">
-                                                        <span class="input-group-text"><i class="fab fa-'.$name.'"></i></span>
-                                                        <input type="url" class="form-control" name="'.$name.'" value="'.iconLink($name).'" />
-                                                        '.(searchIcon($name) != NULL ? '<a href="'.route("deleteLink", searchIcon($name)).'" class="btn btn-danger"><i class="bi bi-trash-fill"></i></a>' : '').'
-                                                      </div>
-                                                    </div>';
+                                    @php
+                                    if (!function_exists('iconLink')) {
+                                        function iconLink($icon) {
+                                            $iconLink = DB::table('links')
+                                                ->where('user_id', Auth::id())
+                                                ->where('title', $icon)
+                                                ->where('button_id', 94)
+                                                ->value('link');
+                                            if (is_null($iconLink)){
+                                                return false;
+                                            } else {
+                                                return $iconLink;
                                             }
-                                        @endphp
+                                        }
+                                    }
+                                    
+                                    if (!function_exists('searchIcon')) {
+                                        function searchIcon($icon) {
+                                            $iconId = DB::table('links')
+                                                ->where('user_id', Auth::id())
+                                                ->where('title', $icon)
+                                                ->where('button_id', 94)
+                                                ->value('id');
+                                            if (is_null($iconId)){
+                                                return false;
+                                            } else {
+                                                return $iconId;
+                                            }
+                                        }
+                                    }
+                                    
+                                    if (!function_exists('iconclicks')) {
+                                        function iconclicks($icon) {
+                                            $iconClicks = searchIcon($icon);
+                                            $iconClicks = DB::table('links')->where('id', $iconClicks)->value('click_number');
+                                            if (is_null($iconClicks)){
+                                                return 0;
+                                            } else {
+                                                return $iconClicks;
+                                            }
+                                        }
+                                    }
+                                    
+                                    if (!function_exists('icon')) {
+                                        function icon($name, $label) {
+                                            echo '<div class="mb-3">
+                                                    <label class="form-label">'.$label.'</label>
+                                                    <span class="form-text" style="font-size: 90%; font-style: italic;">'.__('messages.Clicks').': '.iconclicks($name).'</span>
+                                                    <div class="input-group">
+                                                      <span class="input-group-text"><i class="fab fa-'.$name.'"></i></span>
+                                                      <input type="url" class="form-control" name="'.$name.'" value="'.iconLink($name).'" />
+                                                      '.(searchIcon($name) != NULL ? '<a href="'.route("deleteLink", searchIcon($name)).'" class="btn btn-danger"><i class="bi bi-trash-fill"></i></a>' : '').'
+                                                    </div>
+                                                  </div>';
+                                        }
+                                    }
+                                    @endphp
                                     <style>input{border-top-right-radius: 0.25rem!important; border-bottom-right-radius: 0.25rem!important;}</style>
                             
                             
@@ -270,7 +291,7 @@ if (isset($_COOKIE['LinkCount'])) {
                             
                                 {!!icon('instagram', 'Instagram')!!}
                             
-                                {!!icon('twitter', 'Twitter')!!}
+                                {!!icon('x-twitter', 'X')!!}
                             
                                 {!!icon('facebook', 'Facebook')!!}
                             
@@ -291,11 +312,20 @@ if (isset($_COOKIE['LinkCount'])) {
                                 {!!icon('reddit', 'Reddit')!!}
                             
                                 {!!icon('pinterest', 'Pinterest')!!}
-                            
-                                {{-- {!!icon('telegram', 'Telegram')!!}
-                            
-                                {!!icon('whatsapp', 'WhatsApp')!!} --}}
-                            
+
+                                {!!icon('telegram', 'Telegram')!!}
+
+                                {!!icon('whatsapp', 'WhatsApp')!!}
+
+                                {!! icon('behance', 'Behance') !!}
+
+                                {!! icon('dribbble', 'Dribble') !!}
+
+                                {!! icon('bluesky', 'Bluesky') !!}
+
+                                {!! icon('threads', 'Threads') !!}
+
+                        
                             
                                 <button type="submit" class="mt-3 ml-3 btn btn-primary">{{__('messages.Save links')}}</button>
                             </form>

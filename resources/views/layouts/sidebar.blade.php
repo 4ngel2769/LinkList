@@ -1,9 +1,5 @@
 @php
-use BaconQrCode\Renderer\ImageRenderer;
-use BaconQrCode\Renderer\Image\ImagickImageBackEnd;
-use BaconQrCode\Renderer\RendererStyle\RendererStyle;
-use BaconQrCode\Writer;
-use BaconQrCode\Renderer\Image\SvgImageBackEnd;
+use SimpleSoftwareIO\QrCode\Facades\QrCode;
 use App\Models\User;
 $usrhandl = Auth::user()->littlelink_name;
 @endphp
@@ -685,32 +681,59 @@ $usrhandl = Auth::user()->littlelink_name;
               </div>
               @php
               try {
-                $qrCodeData = url('@'.Auth::user()->littlelink_name);
+                $redirectURL = url('').'/'.'u/'.Auth::user()->id;
 
-                $renderer = new ImageRenderer(
-                    new RendererStyle(400),
-                    new SvgImageBackEnd()
-                );
-                $writer = new Writer($renderer);
+                $argValues = config('advanced-config.qr_code_gradient') ?? [0, 0, 0, 0, 0, 0, 'diagonal'];
+                list($arg1, $arg2, $arg3, $arg4, $arg5, $arg6, $arg7) = $argValues;
 
-                $svgImageData = $writer->writeString($qrCodeData);
+                if (extension_loaded('imagick')) {
+                  $imgSrc = QrCode::format('png')->gradient($arg1, $arg2, $arg3, $arg4, $arg5, $arg6, $arg7)->eye('circle')->style('round')->size(1000)->generate($redirectURL);
+                  $imgSrc = base64_encode($imgSrc);
+                  $imgSrc = 'data:image/png;base64,' . $imgSrc;
+                  $imgType = 'png';
+                } else {
+                  $imgSrc = QrCode::gradient($arg1, $arg2, $arg3, $arg4, $arg5, $arg6, $arg7)->eye('circle')->style('round')->size(1000)->generate($redirectURL);
+                  $imgSrc = base64_encode($imgSrc);
+                  $imgSrc = 'data:image/svg+xml;base64,' . $imgSrc;
+                  $imgType = 'svg';
+                }
 
-                $svgImageBase64 = base64_encode($svgImageData);
-
-                $imgSrc = 'data:image/svg+xml;base64,' . $svgImageBase64;
-              } catch(exception $e) {echo '<p class="text-center pt-5">{{__("messages.QR code could not be generated")}}</p>'; if(auth()->user()->role == 'admin'){echo "<p class='ps-3'>{{__('messages.Reason:')}} <pre class='ps-4'>".$e->getMessage()."</pre></p>";}}
+              } catch(exception $e) {
+                $imgSrc = url('/assets/linkstack/images/themes/no-preview.png');
+                $imgType = NULL;
+              }
               @endphp
               <div class="modal-body">
                 <div class="bd-example">
-                  <img draggable="false" src="@php if(isset($imgSrc)){echo $imgSrc;} @endphp" style="width:100%;height:auto;" class="bd-placeholder-img img-thumbnail">
+                  <img id="generatedImage" draggable="false" src="@php if(isset($imgSrc)){echo $imgSrc;} @endphp" style="width:100%;height:auto;" class="bd-placeholder-img img-thumbnail">
               </div>
               </div>
               <div class="modal-footer">
+                @if($imgType == 'png')
+                  <button type="button" class="btn btn-info" id="downloadButton">{{__('messages.Download')}}</button>
+                @endif
                   <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{__('messages.Close')}}</button>
               </div>
           </div>
       </div>
       </div>
+
+      <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            var downloadButton = document.getElementById("downloadButton");
+            var generatedImage = document.getElementById("generatedImage");
+        
+            downloadButton.addEventListener("click", function() {
+                var format = generatedImage.getAttribute("data-format") || "png";
+                var downloadLink = document.createElement("a");
+                downloadLink.href = generatedImage.src;
+                downloadLink.download = "generated_image." + format;
+                document.body.appendChild(downloadLink);
+                downloadLink.click();
+                document.body.removeChild(downloadLink);
+            });
+        });
+        </script>
 
     <!-- Library Bundle Script -->
     <script src="{{asset('assets/js/core/libs.min.js')}}"></script>
@@ -790,7 +813,6 @@ $usrhandl = Auth::user()->littlelink_name;
 <script src="{{ asset('assets/js/Sortable.min.js') }}"></script>
 <script src="{{ asset('assets/js/jquery-block-ui.js') }}"></script>
 <script src="{{ asset('assets/js/main-dashboard.js') }}"></script>
-
 
 @stack('sidebar-scripts')
 

@@ -4,17 +4,17 @@
 <select name='button' class='form-control'>
         @if($buttonName != 0)<option value='{{$buttonName}}'>{{ucfirst($buttonName)}}</option>@endif
     @foreach ($buttons as $b)
-        @if(!in_array($b["name"], ["custom_website", "custom", "custom", "heading", "space", "text", "icon", $buttonName]))
+        @if($b["exclude"] != true)
         <option class='button button-{{$b["name"]}}' value='{{$b["name"]}}' {{ $b["selected"] == true ? "selected" : ""}}>{{$b["title"]}}</option>
         @endif
     @endforeach
 </select>
 
 <label for='title' class='form-label'>{{__('messages.Custom Title')}}</label>
-<input type='text' name='title' value='{{$link_title}}' class='form-control' />
+<input type='text' name='title' value='{{$title}}' class='form-control' />
 <span class='small text-muted'>{{__('messages.Leave blank for default title')}}</span><br>
 
 <label for='link' class='form-label'>{{__('messages.URL')}}</label>
-<input type='url' name='link' value='{{$link_url}}' class='form-control' required />
+<input type='url' name='link' value='{{$link}}' class='form-control' required />
 <span class='small text-muted'>{{__('messages.Enter the link URL')}}</span>
 

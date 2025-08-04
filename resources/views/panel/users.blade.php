@@ -1,8 +1,12 @@
+<?php use App\Models\User; ?>
+
 @extends('layouts.sidebar')
 
 @section('content')
 
-<style>#cs{cursor: pointer;}.delete{color:transparent; background-color:tomato; border-radius:5px; padding:8px 12px; cursor: pointer;}.delete:hover{color:transparent;background-color:#f13d1d;}html,body{max-width:100%;overflow-x:hidden;}.shorten{cursor:help;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:150px;}</style>
+<style>
+  [x-cloak] { display: none !important; }
+</style>
 
 <div class="conatiner-fluid content-inner mt-n5 py-0">
   <div class="row">   
@@ -17,135 +21,142 @@
                       <section class="text-gray-400">
                         <h2 class="mb-4 card-header"><i class="bi bi-person"> {{__('messages.Manage Users')}}</i></h2>
                         <div class="card-body p-0 p-md-3">
-                
-                        <form action="{{ route('searchUser') }}" method="post">
-                        @csrf
-                          <div class="row">
-                            <div class="col-lg-8">
-                              <div class="input-group mb-3">
-                                <input type="text" name="name" placeholder="{{__('messages.Search user')}}" class="form-control">
-                                <div class="input-group-append">
-                                  <button type="submit" class="btn btn-primary"><i class="bi bi-search"></i></button>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        </form>
-                        {{__('messages.Users:')}}
-                        <a href="{{ url('') }}/admin/users/all">All</a> - 
-                        <a href="{{ url('') }}/admin/users/user">User</a> - 
-                        <a href="{{ url('') }}/admin/users/vip">Vip</a> - 
-                        <a href="{{ url('') }}/admin/users/admin">Admin</a> 
-                
-                        <div class="row"><div class="table-responsive">
-                          <table class="table table-stripped">
-                            <thead>
-                              <tr>
-                                <th id="cs" scope="col" data-sort="id" data-order="asc">{{__('messages.ID')}}</th>
-                                <th id="cs" scope="col" data-sort="name" data-order="asc">{{__('messages.Name')}}</th>
-                                <th id="cs" scope="col" data-sort="email" data-order="asc">{{__('messages.E-Mail')}}</th>
-                                <th id="cs" scope="col" data-sort="page" data-order="asc">{{__('messages.Page')}}</th>
-                                <th id="cs" scope="col" data-sort="role" data-order="asc">{{__('messages.Role')}}</th>              
-                                <th id="cs" scope="col" data-sort="links" data-order="asc">{{__('messages.Links')}}</th>
-                                <th id="cs" scope="col" data-sort="clicks" data-order="asc">{{__('messages.Clicks')}}</th>
-                                <th id="cs" scope="col" data-sort="created" data-order="asc">{{__('messages.Created at')}}</th>
-                                <th id="cs" scope="col" data-sort="last" data-order="asc">{{__('messages.Last seen')}}</th>
-                                @if(env('REGISTER_AUTH') !== 'auth')<th id="cs" scope="col">{{__('messages.E-Mail')}}</th>@endif
-                                <th id="cs" scope="col" data-sort="block" data-order="asc">{{__('messages.Status')}}</th>
-                                <th scope="col" data-sortable="false">{{__('messages.Action')}}</th>
-                              </tr>
-                            </thead>
-                            <tbody>
-                            @foreach($users as $user)
-                            @php
-                            $dateFormat = __('messages.date.format');
-                  
-                            $date = date($dateFormat, strtotime($user->created_at));
-                            if(!isset($user->created_at)){$date = __('messages.N/A');}
-                  
-                            $lastSeen = $user->updated_at;
-                            $lastSeenDate = date($dateFormat, strtotime($lastSeen));
-                            $timezone = new DateTimeZone(date_default_timezone_get()); 
-                            $datetime = new DateTime($lastSeen, $timezone);
-                            $now = new DateTime(null, $timezone);
-                            $interval = $now->diff($datetime);
-                            $daysAgo = $interval->days." ".__('messages.days ago');
-                            if($interval->days == 1) $daysAgo = __('messages.1 day ago');
-                            if($interval->days == 0) $daysAgo = __('messages.Today');
-                            if ($interval->days >= 365) {
-                            $yearsAgo = floor($interval->days / 365);
-                            if ($yearsAgo == 1) {
-                                $daysAgo = __('messages.1 year ago');
-                            } else {
-                                $daysAgo = $yearsAgo . __('messages.years ago');
-                            }}
-                            @endphp
-                              <tr>
-                                <td data-id>{{ $user->id }}</td>
-                                <td class="shorten" title="{{ $user->name }}" data-name> {{ $user->name }} </td>
-                                <td class="shorten" title="{{ $user->email }}" data-email> {{ $user->email }} </td>
-                                <td class="shorten" title="{{ $user->littlelink_name }}" data-page>@if(isset($user->littlelink_name))<a href="{{ url('') }}/@<?= $user->littlelink_name ?>" target="_blank" class="text-info"><i class="bi bi-box-arrow-up-right"></i>&nbsp; {{ $user->littlelink_name }} </a>@else {{__('messages.N/A')}} @endif</td>
-                                <td data-role>{{ $user->role }}</td>
-                                <td data-links>{{$user->links}}</td>
-                                <td data-clicks>{{$user->clicks}}</td>
-                                <td data-created>{{$date}}</td>
-                                <td class="shorten" data-last title="{{ $lastSeenDate }}">{{$daysAgo}}</td>
-                                @if(env('REGISTER_AUTH') !== 'auth')
-                                <td>@if($user->find($user->id)->role == 'admin' and $user->email_verified_at != '')<center>-</center> @else
-                                <a href="{{ route('verifyUser', ['verify' => '-' . $user->email_verified_at, 'id' => $user->id] ) }}" class="text-danger">@if($user->email_verified_at == '')<span class="badge bg-danger">{{__('messages.Pending')}}</span>@else<span class="badge bg-success">{{__('messages.Verified')}}</span></a>@endif</td>
-                                @endif
-                                @endif
-                                <td>@if($user->find($user->id)->role == 'admin' and $user->id == 1)<center>-</center>@else<a href="{{ route('blockUser', ['block' => $user->block, 'id' => $user->id] ) }}">@if($user->block == 'yes') <span class="badge bg-danger">{{__('messages.Pending')}}</span> @elseif($user->block == 'no') <span class="badge bg-success">{{__('messages.Approved')}}</span> @endif</a>@endif</td>
-                                <td>
-                                  @if($user->find($user->id)->role == 'admin' and $user->id == 1)<center>-</center>
-                                  @else
-                                  <div class="flex align-items-center list-user-action">
-                                    <a class="btn btn-sm btn-icon btn-success" data-bs-toggle="tooltip" data-bs-placement="top" data-original-title="{{__('messages.tt.All links')}}" href="{{ route('showLinksUser', $user->id ) }}" aria-label="All links" data-bs-original-title="All links">
-                                       <span class="btn-inner">   
-                                          <svg class="icon-20" width="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                            <circle cx="11.7669" cy="11.7666" r="8.98856" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></circle>
-                                            <path d="M18.0186 18.4851L21.5426 22" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
-                                          </svg>                                                               
-                                       </span>
-                                    </a>
-                                    <a class="btn btn-sm btn-icon btn-warning" data-bs-toggle="tooltip" data-bs-placement="top" data-original-title="{{__('messages.tt.Edit')}}" href="{{ route('editUser', $user->id ) }}" aria-label="Edit" data-bs-original-title="Edit">
-                                       <span class="btn-inner">
-                                          <svg class="icon-20" width="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                             <path d="M11.4925 2.78906H7.75349C4.67849 2.78906 2.75049 4.96606 2.75049 8.04806V16.3621C2.75049 19.4441 4.66949 21.6211 7.75349 21.6211H16.5775C19.6625 21.6211 21.5815 19.4441 21.5815 16.3621V12.3341" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
-                                             <path fill-rule="evenodd" clip-rule="evenodd" d="M8.82812 10.921L16.3011 3.44799C17.2321 2.51799 18.7411 2.51799 19.6721 3.44799L20.8891 4.66499C21.8201 5.59599 21.8201 7.10599 20.8891 8.03599L13.3801 15.545C12.9731 15.952 12.4211 16.181 11.8451 16.181H8.09912L8.19312 12.401C8.20712 11.845 8.43412 11.315 8.82812 10.921Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
-                                             <path d="M15.1655 4.60254L19.7315 9.16854" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
-                                          </svg>
-                                       </span>
-                                    </a>
-                                    <a class="btn btn-sm btn-icon btn-danger confirmation" data-bs-toggle="tooltip" data-bs-placement="top" data-original-title="{{__('messages.tt.Delete')}}" href="{{ route('deleteUser', ['id' => $user->id] ) }}" aria-label="Delete" data-bs-original-title="Delete">
-                                       <span class="btn-inner">
-                                          <svg class="icon-20" width="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="currentColor">
-                                             <path d="M19.3248 9.46826C19.3248 9.46826 18.7818 16.2033 18.4668 19.0403C18.3168 20.3953 17.4798 21.1893 16.1088 21.2143C13.4998 21.2613 10.8878 21.2643 8.27979 21.2093C6.96079 21.1823 6.13779 20.3783 5.99079 19.0473C5.67379 16.1853 5.13379 9.46826 5.13379 9.46826" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
-                                             <path d="M20.708 6.23975H3.75" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
-                                             <path d="M17.4406 6.23973C16.6556 6.23973 15.9796 5.68473 15.8256 4.91573L15.5826 3.69973C15.4326 3.13873 14.9246 2.75073 14.3456 2.75073H10.1126C9.53358 2.75073 9.02558 3.13873 8.87558 3.69973L8.63258 4.91573C8.47858 5.68473 7.80258 6.23973 7.01758 6.23973" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
-                                          </svg>
-                                       </span>
-                                    </a>
-                                 </div>
-                                  @endif
-                                </td>
-                              </tr>
-                              @endforeach
-                            </tbody>
-                          </table>
-                        </div></div></div>
+
+                        <div id="select-active" class="d-none">
+                          <h5 class="mb-2">{{__('messages.Select Action')}}:</h3>
+                          <button class="mb-3 btn btn-danger rounded-pill btn-sm">
+                              <span class="btn-inner">
+                                <svg class="icon-16" width="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                  <path fill-rule="evenodd" clip-rule="evenodd" d="M20.2871 5.24297C20.6761 5.24297 21 5.56596 21 5.97696V6.35696C21 6.75795 20.6761 7.09095 20.2871 7.09095H3.71385C3.32386 7.09095 3 6.75795 3 6.35696V5.97696C3 5.56596 3.32386 5.24297 3.71385 5.24297H6.62957C7.22185 5.24297 7.7373 4.82197 7.87054 4.22798L8.02323 3.54598C8.26054 2.61699 9.0415 2 9.93527 2H14.0647C14.9488 2 15.7385 2.61699 15.967 3.49699L16.1304 4.22698C16.2627 4.82197 16.7781 5.24297 17.3714 5.24297H20.2871ZM18.8058 19.134C19.1102 16.2971 19.6432 9.55712 19.6432 9.48913C19.6626 9.28313 19.5955 9.08813 19.4623 8.93113C19.3193 8.78413 19.1384 8.69713 18.9391 8.69713H5.06852C4.86818 8.69713 4.67756 8.78413 4.54529 8.93113C4.41108 9.08813 4.34494 9.28313 4.35467 9.48913C4.35646 9.50162 4.37558 9.73903 4.40755 10.1359C4.54958 11.8992 4.94517 16.8102 5.20079 19.134C5.38168 20.846 6.50498 21.922 8.13206 21.961C9.38763 21.99 10.6811 22 12.0038 22C13.2496 22 14.5149 21.99 15.8094 21.961C17.4929 21.932 18.6152 20.875 18.8058 19.134Z" fill="currentColor"></path>
+                                </svg>                        
+                              </span>
+                              Delete
+                          </button>
+                        </div>
+
+                        <livewire:user-table />
+                        
                         <a href="{{ url('') }}/admin/new-user">+ {{__('messages.Add new user')}}</a>
-                
-                              <script type="text/javascript">
-                                var elems = document.getElementsByClassName('confirmation');
-                                var confirmIt = function (e) {
-                                    if (!confirm("{{__('messages.confirm.delete.user')}}")) e.preventDefault();
-                                };
-                                for (var i = 0, l = elems.length; i < l; i++) {
-                                    elems[i].addEventListener('click', confirmIt, false);
-                                }
-                              </script>
-                
+                        
+                        <script type="text/javascript">
+                          // Function to confirm and delete users
+                          var confirmIt = function(e) {
+                              e.preventDefault();
+                              if (confirm("{{ __('messages.confirm.delete.user') }}")) {
+                                  var userId = this.getAttribute('data-id');
+                                  this.innerHTML = '<div class="d-flex justify-content-center"><div class="spinner-border spinner-border-sm text-primary" role="status"><span class="visually-hidden">Loading...</span></div></div>';
+                                  deleteUserData(userId);
+                              }
+                          };
+                      
+                          var deleteUserData = function(userId) {
+                              var xhr = new XMLHttpRequest();
+                              xhr.open('POST', `{{ route('deleteTableUser', ['id' => ':id']) }}`.replace(':id', userId), true);
+                              xhr.setRequestHeader('X-CSRF-TOKEN', '{{ csrf_token() }}');
+                              xhr.setRequestHeader('Content-Type', 'application/json;charset=UTF-8');
+                              xhr.onreadystatechange = function() {
+                                  if (xhr.readyState === 4 && xhr.status === 200) {
+                                      refreshLivewireTable();
+                                  }
+                              };
+                              xhr.send(JSON.stringify({ id: userId }));
+                          };
+                      
+                          // Function to handle user actions (verification and blocking)
+                          var handleUserClick = function(e) {
+                              e.preventDefault();
+                              var userId = this.getAttribute('data-id');
+                              this.innerHTML = '<div class="d-flex justify-content-center"><div class="spinner-border spinner-border-sm text-primary" role="status"><span class="visually-hidden">Loading...</span></div></div>';
+                              sendUserAction(userId);
+                          };
+                      
+                          var sendUserAction = function(userId) {
+                              var xhr = new XMLHttpRequest();
+                              xhr.open('GET', userId, true);
+                              xhr.onreadystatechange = function() {
+                                  if (xhr.readyState === 4 && xhr.status === 200) {
+                                      refreshLivewireTable();
+                                  }
+                              };
+                              xhr.send();
+                          };
+                      
+                          // Attach click event listeners to elements with class 'confirmation', 'user-email', and 'user-block'
+                          var attachClickEventListeners = function(className, handler) {
+                              var elems = document.getElementsByClassName(className);
+                              for (var i = 0, l = elems.length; i < l; i++) {
+                                  elems[i].addEventListener('click', handler, false);
+                              }
+                          };
+
+                          // Function to refresh the Livewire table
+                          var refreshLivewireTable = function() {
+                            Livewire.components.getComponentsByName('user-table')[0].$wire.$refresh()
+                          };
+                      
+                          attachClickEventListeners('confirmation', confirmIt);
+                          attachClickEventListeners('user-email', handleUserClick);
+                          attachClickEventListeners('user-block', handleUserClick);
+                      </script>
+{{-- <script type="text/javascript">
+// Get the delete button div
+var deleteButtonDiv = document.getElementById('select-active');
+
+// Get all checkboxes
+var checkboxes = document.querySelectorAll('.form-check-input');
+
+// Function to check if at least one checkbox is selected
+var isAnyCheckboxSelected = function() {
+    for (var i = 0; i < checkboxes.length; i++) {
+        if (checkboxes[i].checked) {
+            return true;
+        }
+    }
+    return false;
+};
+
+// Function to show or hide the delete button div
+var showOrHideDeleteButton = function() {
+    if (isAnyCheckboxSelected()) {
+        deleteButtonDiv.classList.remove('d-none');
+    } else {
+        setTimeout(function() {
+            deleteButtonDiv.classList.add('d-none');
+        });
+    }
+};
+
+// Add event listener to checkboxes
+for (var i = 0; i < checkboxes.length; i++) {
+    checkboxes[i].addEventListener('change', showOrHideDeleteButton);
+}
+
+// Get the delete button
+var deleteButton = deleteButtonDiv.querySelector('button');
+
+// Function to delete selected users
+var deleteSelectedUsers = function() {
+    for (var i = 0; i < checkboxes.length; i++) {
+        if (checkboxes[i].checked && checkboxes[i].getAttribute('data-id') !== null) {
+            var userId = checkboxes[i].getAttribute('data-id');
+
+            // Find the corresponding <a> element
+            var deleteButton = document.querySelector('a[data-id="' + userId + '"]');
+
+            // If the <a> element exists, add loading spinner to it
+            if (deleteButton) {
+                deleteButton.innerHTML = '<div class="d-flex justify-content-center"><div class="spinner-border spinner-border-sm text-primary" role="status"><span class="visually-hidden">Loading...</span></div></div>';
+            }
+
+            deleteUserData(userId);
+        }
+    }
+};
+
+// Add event listener to delete button
+deleteButton.addEventListener('click', deleteSelectedUsers);
+</script> --}}
+
                           </div>
                 </section>
   
@@ -159,50 +170,14 @@
     </div>
   </div>
 
-<script>
-const getCellValue = (tr, idx) => tr.children[idx].innerText || tr.children[idx].textContent;
+@push('sidebar-stylesheets')
+<script defer src="{{url('assets/js/cdn.min.js')}}"></script>
+<script src="{{url('vendor/livewire/livewire/dist/livewire.js')}}"></script>
+@endpush
 
-const comparer = (idx, asc) => (a, b) =>
-  ((v1, v2) =>
-    v1 !== '' && v2 !== '' && !isNaN(v1) && !isNaN(v2) ? v1 - v2 : v1.toString().localeCompare(v2)
-  )(getCellValue(asc ? a : b, idx), getCellValue(asc ? b : a, idx));
-
-// Find the table and its headers
-const table = document.querySelector('table');
-const headers = table.querySelectorAll('th');
-
-// Add caret icon to initial header element
-const initialHeader = table.querySelector('[data-order]');
-initialHeader.innerHTML = `${initialHeader.innerText} <i class="bi bi-caret-down-fill"></i>`;
-
-// Attach click event listener to all headers
-headers.forEach(th => th.addEventListener('click', function() {
-  // Get the clicked header's index, sort order, and sortable attribute
-  const thIndex = Array.from(th.parentNode.children).indexOf(th);
-  const isAscending = this.asc = !this.asc;
-  const isSortable = th.getAttribute('data-sortable') !== 'false';
-
-  // If the column is not sortable, do nothing
-  if (!isSortable) {
-    return;
-  }
-
-  // Remove caret icon and active class from all headers
-  headers.forEach(h => {
-    h.classList.remove('active');
-    h.innerHTML = h.innerText;
-  });
-
-  // Add caret icon and active class to clicked header
-  th.classList.add('active');
-  th.innerHTML = `${th.innerText} ${isAscending ? '<i class="bi bi-caret-down-fill"></i>' : '<i class="bi bi-caret-up-fill"></i>'}`;
-
-  // Sort the table rows based on the clicked header
-  Array.from(table.querySelectorAll('tr:nth-child(n+2)'))
-    .sort(comparer(thIndex, isAscending))
-    .forEach(tr => table.appendChild(tr));
-}));
-</script>
-
+@push('sidebar-scripts')
+<livewire:scripts />
+<script src="{{url('assets/js/livewire-sortable.js')}}"></script>
+@endpush
 
 @endsection

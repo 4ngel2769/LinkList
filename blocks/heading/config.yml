@@ -1,0 +1,4 @@
+id: 3
+typename: heading
+icon: "bi bi-card-heading"
+custom_html: true

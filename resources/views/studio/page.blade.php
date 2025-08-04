@@ -194,6 +194,18 @@
                 </div>                
                 <section class='text-gray-400'>
                 <h3 class="mb-4 card-header"><i class="bi bi-file-earmark-break"> {{__('messages.My Profile')}}</i></h3>
+                @if($errors->any())
+                <div class="alert alert-danger d-flex align-items-center" role="alert">
+                    <svg class="bi flex-shrink-0 me-2" width="24" height="24">
+                        <use xlink:href="#exclamation-triangle-fill"></use>
+                    </svg>
+                    <div>
+                        @foreach ($errors->all() as $error)
+                            {{ $error }}
+                        @endforeach
+                    </div>
+                </div>
+                @endif
                 <div>
                 
                 <div></div>
@@ -203,7 +215,7 @@
                     @if($page->littlelink_name != '')
                     <div class="form-group col-lg-8">
                       <label class="form-label" for="customFile">{{__('messages.Profile Picture')}}</label>
-                      <input type="file" accept="image/jpeg,image/jpg,image/png" name="image" class="form-control" id="customFile">
+                      <input type="file" accept="image/jpeg,image/jpg,image/png,image/webp" name="image" class="form-control" id="customFile">
                   </div>
                     @endif
                 
@@ -217,14 +229,13 @@
                             $url = $_SERVER['REQUEST_URI'];
                              if( strpos( $url, "no_page_name" ) == true ) echo '<span style="color:#FF0000; font-size:120%;">You do not have a Page URL</span>'; ?>
                         <br>
-                        <label>{{__('messages.Page URL')}}</label>
-                        <div class="input-group">
-                            <div class="input-group-prepend">
-                              <div class="d-none d-md-block input-group-text">{{ url('') }}/@</div>
-                              <div class="d-md-none input-group-text">@</div>
-                            </div>
-                            <input type="text" class="form-control" name="littlelink_name" value="{{ $page->littlelink_name ?? '' }}" required>
+                        <label for="littlelink_name" class="form-label">{{__('messages.Page URL')}}</label>
+                        <div class="input-group mb-3 has-validation">
+                          <span class="input-group-text" id="basic-addon3">{{str_replace(['http://', 'https://'], '', url(''))}}/@</span>
+                          <input type="littlelink_name" class="form-control" id="littlelink_name" name="littlelink_name" aria-describedby="littlelink_name" value="{{ $page->littlelink_name ?? '' }}" :value="old('littlelink_name')" required autofocus >
                         </div>
+                        <script>var exceptionvar = " value="{{ $page->littlelink_name }}";</script>
+                        @include('auth.url-validation')
                 
                          <label style="margin-top:15px">{{__('messages.Display name')}}</label>
                         <div class="input-group">
@@ -260,7 +271,15 @@
                           <label class="form-check-label" for="sharebtn">{{__('messages.Enable')}}</label>
                         </div>
 
-                    <button type="submit" class="mt-3 ml-3 btn btn-primary">{{__('messages.Save')}}</button>
+                        <div class="form-group col-lg-8">
+                          <h5 style="margin-top:50px">{{__('messages.Open links in new tab')}}</h5>
+                          <p class="text-muted">{{__('messages.openlinksnewtab')}}</p>
+                            <div class="mb-3 form-check form-switch">
+                              <input name="tablinks" class="switch toggle-btn" type="checkbox" id="tablinks" <?php if(UserData::getData(Auth::user()->id, 'links-new-tab') != false){echo 'checked';} ?> />
+                              <label class="form-check-label" for="tablinks">{{__('messages.Enable')}}</label>
+                            </div>
+
+                    <button id="submit-btn" type="submit" class="mt-3 ml-3 btn btn-primary">{{__('messages.Save')}}</button>
                 </form>
 
                 @if(env('ALLOW_USER_HTML') === true)

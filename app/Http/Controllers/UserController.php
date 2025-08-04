@@ -9,6 +9,11 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Response;
 use JeroenDesloovere\VCard\VCard;
+use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\ReportSubmissionMail;
+use GeoSot\EnvEditor\Facades\EnvEditor;
 
 use Auth;
 use DB;
@@ -79,19 +84,48 @@ class UserController extends Controller
     //Show littlelink page. example => http://127.0.0.1:8000/+admin
     public function littlelink(request $request)
     {
-        $littlelink_name = $request->littlelink;
-        $id = User::select('id')->where('littlelink_name', $littlelink_name)->value('id');
+        if(isset($request->useif)){
+            $littlelink_name = User::select('littlelink_name')->where('id', $request->littlelink)->value('littlelink_name');
+            $id = $request->littlelink;
+        } else {
+            $littlelink_name = $request->littlelink;
+            $id = User::select('id')->where('littlelink_name', $littlelink_name)->value('id');
+        }
 
         if (empty($id)) {
             return abort(404);
         }
      
-        $userinfo = User::select('id', 'name', 'littlelink_name', 'littlelink_description', 'theme', 'role')->where('id', $id)->first();
+        $userinfo = User::select('id', 'name', 'littlelink_name', 'littlelink_description', 'theme', 'role', 'block')->where('id', $id)->first();
         $information = User::select('name', 'littlelink_name', 'littlelink_description', 'theme')->where('id', $id)->get();
         
-        $links = DB::table('links')->join('buttons', 'buttons.id', '=', 'links.button_id')->select('links.link', 'links.id', 'links.button_id', 'links.title', 'links.custom_css', 'links.custom_icon', 'buttons.name')->where('user_id', $id)->orderBy('up_link', 'asc')->orderBy('order', 'asc')->get();
+        if ($userinfo->block == 'yes') {
+            return abort(404);
+        }
+        
+        $links = DB::table('links')
+        ->join('buttons', 'buttons.id', '=', 'links.button_id')
+        ->select('links.*', 'buttons.name') // Assuming 'links.*' to fetch all columns including 'type_params'
+        ->where('user_id', $id)
+        ->orderBy('up_link', 'asc')
+        ->orderBy('order', 'asc')
+        ->get();
 
-        return view('littlelink', ['userinfo' => $userinfo, 'information' => $information, 'links' => $links, 'littlelink_name' => $littlelink_name]);
+        // Loop through each link to decode 'type_params' and merge it into the link object
+        foreach ($links as $link) {
+            if (!empty($link->type_params)) {
+                // Decode the JSON string into an associative array
+                $typeParams = json_decode($link->type_params, true);
+                if (is_array($typeParams)) {
+                    // Merge the associative array into the link object
+                    foreach ($typeParams as $key => $value) {
+                        $link->$key = $value;
+                    }
+                }
+            }
+        }
+
+        return view('linkstack.linkstack', ['userinfo' => $userinfo, 'information' => $information, 'links' => $links, 'littlelink_name' => $littlelink_name]);
     }
 
     //Show littlelink page as home page if set in config
@@ -104,353 +138,177 @@ class UserController extends Controller
             return abort(404);
         }
      
-        $userinfo = User::select('id', 'name', 'littlelink_name', 'littlelink_description', 'theme', 'role')->where('id', $id)->first();
+        $userinfo = User::select('id', 'name', 'littlelink_name', 'littlelink_description', 'theme', 'role', 'block')->where('id', $id)->first();
         $information = User::select('name', 'littlelink_name', 'littlelink_description', 'theme')->where('id', $id)->get();
         
-        $links = DB::table('links')->join('buttons', 'buttons.id', '=', 'links.button_id')->select('links.link', 'links.id', 'links.button_id', 'links.title', 'links.custom_css', 'links.custom_icon', 'buttons.name')->where('user_id', $id)->orderBy('up_link', 'asc')->orderBy('order', 'asc')->get();
+        $links = DB::table('links')
+        ->join('buttons', 'buttons.id', '=', 'links.button_id')
+        ->select('links.*', 'buttons.name') // Assuming 'links.*' to fetch all columns including 'type_params'
+        ->where('user_id', $id)
+        ->orderBy('up_link', 'asc')
+        ->orderBy('order', 'asc')
+        ->get();
 
-        return view('littlelink', ['userinfo' => $userinfo, 'information' => $information, 'links' => $links, 'littlelink_name' => $littlelink_name]);
+        // Loop through each link to decode 'type_params' and merge it into the link object
+        foreach ($links as $link) {
+            if (!empty($link->type_params)) {
+                // Decode the JSON string into an associative array
+                $typeParams = json_decode($link->type_params, true);
+                if (is_array($typeParams)) {
+                    // Merge the associative array into the link object
+                    foreach ($typeParams as $key => $value) {
+                        $link->$key = $value;
+                    }
+                }
+            }
+        }
+
+        return view('linkstack.linkstack', ['userinfo' => $userinfo, 'information' => $information, 'links' => $links, 'littlelink_name' => $littlelink_name]);
+    }
+
+    //Redirect to user page
+    public function userRedirect(request $request)
+    {
+        $id = $request->id;
+        $user = User::select('littlelink_name')->where('id', $id)->value('littlelink_name');
+
+        if (empty($id)) {
+            return abort(404);
+        }
+     
+        if (empty($user)) {
+            return abort(404);
+        }
+
+        return redirect(url('@'.$user));
     }
 
     //Show add/update form
     public function AddUpdateLink($id = 0)
     {
+        $linkData = $id ? Link::find($id) : new Link(['typename' => 'link', 'id' => '0']);
+    
+        $data = [
+            'LinkTypes' => LinkType::get(),
+            'LinkData' => $linkData,
+            'LinkID' => $id,
+            'linkTypeID' => "predefined",
+            'title' => "Predefined Site",
+        ];
 
-        if ($id !== 0) {
-            $linkData = Link::find($id);
-        } elseif ($id == 0) {
-            $linkData = new Link(['typename' => 'link', 'id'=>'0']);
-        } else {
-            $linkData = new Link(['typename' => 'link', 'id'=>'0']);
-        }
-        $data['LinkTypes'] = LinkType::get();
-        $data['LinkData'] = $linkData;
-        $data['LinkID'] = $id;
-        $data['linkTypeID'] = "1";
-        $data['title'] = "Predefined Site";
-
-        if (Route::currentRouteName() != 'showButtons') {
-            $links = DB::table('links')->where('id', $id)->first();
-
-            $bid = $links->button_id;
-
-            if($bid == 1 or $bid == 2){
-                $data['linkTypeID'] = "2";
-            } elseif ($bid == 42) {
-                $data['linkTypeID'] = "3";
-            } elseif ($bid == 43) {
-                $data['linkTypeID'] = "4";
-            } elseif ($bid == 93) {
-                $data['linkTypeID'] = "5";
-            } elseif ($bid == 6 or $bid == 7) {
-                $data['linkTypeID'] = "6";
-            } elseif ($bid == 44) {
-                $data['linkTypeID'] = "7";
-            } elseif ($bid == 96) {
-                $data['linkTypeID'] = "8";
-            } else {
-                $data['linkTypeID'] = "1";
-            }
-
-            $data['title'] = LinkType::where('id', $data['linkTypeID'])->value('title');
-        }
-
-        foreach ($data['LinkTypes']->toArray() as $key => $val) {
-            if ($val['typename'] === $linkData['typename']) {
-                $data['SelectedLinkType'] = $val;
-                break;
-            }
-        }
-        
+        $data['typename'] = $linkData->type ?? 'predefined';
+    
         return view('studio/edit-link', $data);
     }
 
     //Save add link
-    public function saveLink(request $request)
+    public function saveLink(Request $request)
     {
+        // Step 1: Validate Request
+        // $request->validate([
+        //     'link' => 'sometimes|url',
+        // ]);
+    
+        // Step 2: Determine Link Type and Title
+        $linkType = LinkType::findByTypename($request->typename);
+        $LinkTitle = $request->title;
+        $LinkURL = $request->link;
 
-        $linkType = LinkType::find($request->linktype_id);
-        $LinkTitle = ($request->link_text ?? $request->link_title) ?? $request->title;
-        $LinkURL = $request->link_url ?? $request->link;
+        // Step 3: Load Link Type Logic
+        if($request->typename == 'predefined' || $request->typename == 'link') {
+            // Determine button id based on whether a custom or predefined button is used
+            $button_id = ($request->typename == 'link') ? ($request->GetSiteIcon == 1 ? 2 : 1) : null;
+            $button = ($request->typename != 'link') ? Button::where('name', $request->button)->first() : null;
 
+            $linkData = [
+                'link' => $LinkURL,
+                'title' => $LinkTitle ?? $button?->alt,
+                'user_id' => Auth::user()->id,
+                'button_id' => $button?->id ?? $button_id,
+                'type' => $request->typename // Save the link type
+            ];
+        } else {
+            $linkTypePath = base_path("blocks/{$linkType->typename}/handler.php");
+            if (file_exists($linkTypePath)) {
+                include $linkTypePath;
+                $result = handleLinkType($request, $linkType);
+                
+                // Extract rules and linkData from the result
+                $rules = $result['rules'];
+                $linkData = $result['linkData'];
+            
+                // Validate the request
+                $validator = Validator::make($request->all(), $rules);
 
-        $OrigLink = Link::find($request->linkid);
+                // Check if validation fails
+                if ($validator->fails()) {
+                    return back()->withErrors($validator)->withInput();
+                }
 
-        $customParams = [];
-        foreach ($request->all() as $key => $param) {
-            //echo $key . " = " . $param . "<br />";
-            if (str_starts_with($key, "_") ||  in_array($key, ['linktype_id', 'linktype_title', 'link_text', 'link_url']))
-                continue;
+                $linkData['button_id'] = $linkData['button_id'] ?? 1; // Set 'button_id' unless overwritten by handleLinkType
+                $linkData['type'] = $linkType->typename; // Ensure 'type' is included in $linkData
+            } else {
+                abort(404, "Link type logic not found.");
+            }
+        }   
 
-            $customParams[$key] = $param;
-        }
+        // Step 4: Handle Custom Parameters
+        // (Same as before)
 
+        // Step 5: User and Button Information
         $userId = Auth::user()->id;
         $button = Button::where('name', $request->button)->first();
+        if ($button && empty($LinkTitle)) $LinkTitle = $button->alt;
 
-        if ($button && empty($LinkTitle))
-            $LinkTitle = ucwords($button->name);
+        // Step 6: Prepare Link Data
+        // (Handled by the included file)
 
-        if ($linkType->typename == 'video' && empty($LinkTitle)) {
-            $embed = OEmbed::get($LinkURL);
-            if ($embed) {
-                $LinkTitle = $embed->data()['title'];
+        // Step 7: Save or Update Link
+        $OrigLink = Link::find($request->linkid);
+        $linkColumns = Schema::getColumnListing('links'); // Get all column names of links table
+        $filteredLinkData = array_intersect_key($linkData, array_flip($linkColumns)); // Filter $linkData to only include keys that are columns in the links table
+
+        // Combine remaining variables into one array and convert to JSON for the type_params column
+        $customParams = array_diff_key($linkData, $filteredLinkData);
+
+            // Check if $linkType->custom_html is defined and not null
+            if (isset($linkType->custom_html)) {
+                // Add $linkType->custom_html to the $customParams array
+                $customParams['custom_html'] = $linkType->custom_html;
             }
-        }
 
-        $message = (ucwords($button?->name) ?? ucwords($linkType->typename)). " has been ";
+            // Check if $linkType->ignore_container is defined and not null
+            if (isset($linkType->ignore_container)) {
+                // Add $linkType->ignore_container to the $customParams array
+                $customParams['ignore_container'] = $linkType->ignore_container;
+            }
+
+            // Check if $linkType->include_libraries is defined and not null
+            if (isset($linkType->include_libraries)) {
+                // Add $linkType->include_libraries to the $customParams array
+                $customParams['include_libraries'] = $linkType->include_libraries;
+            }
+        
+        $filteredLinkData['type_params'] = json_encode($customParams);
 
         if ($OrigLink) {
-            //EDITING EXISTING
-
-            $isCustomWebsite = $customParams['GetSiteIcon'] ?? null;
-            $SpacerHeight = $customParams['height'] ?? null;
-
-                if($linkType->typename == "link" and $isCustomWebsite == "1"){
-                    $OrigLink->update([
-                        'link' => $LinkURL,
-                        'title' => $LinkTitle,
-                        'button_id' => "2",
-                    ]);
-                }elseif($linkType->typename == "link"){
-                    $OrigLink->update([
-                        'link' => $LinkURL,
-                        'title' => $LinkTitle,
-                        'button_id' => "1",
-                    ]);
-                }elseif($linkType->typename == "spacer"){
-                    $OrigLink->update([
-                        'link' => $LinkURL,
-                        'title' => $customParams['height'] ?? null,
-                        'button_id' => "43",
-                    ]);
-                }elseif($linkType->typename == "heading"){
-                    $OrigLink->update([
-                        'link' => $LinkURL,
-                        'title' => $LinkTitle,
-                        'button_id' => "42",
-                    ]);
-                }elseif($linkType->typename == "text"){
-                    $OrigLink->update([
-                        'button_id' => "93",
-                        'title' => $request->text,
-                    ]);
-                }elseif($linkType->typename == "email"){
-                    $LinkURL = "mailto:".$LinkURL;
-                    $OrigLink->update([
-                        'link' => $LinkURL,
-                        'button_id' => $button?->id,
-                        'title' => $LinkTitle,
-                    ]);
-                }elseif($linkType->typename == "telephone"){
-                    $LinkURL = "tel:".$LinkURL;
-                    $OrigLink->update([
-                        'link' => $LinkURL,
-                        'button_id' => $button?->id,
-                        'title' => $LinkTitle,
-                    ]);
-                }elseif($linkType->typename == "vcard"){
-
-                    $prefix = $request->input('prefix');
-                    $firstName = $request->input('first_name');
-                    $middleName = $request->input('middle_name');
-                    $lastName = $request->input('last_name');
-                    $suffix = $request->input('suffix');
-                    $nickname = $request->input('nickname');
-                    $organization = $request->input('organization');
-                    $vtitle = $request->input('vtitle');
-                    $role = $request->input('role');
-                    $workUrl = $request->input('work_url');
-                    $email = $request->input('email');
-                    $workEmail = $request->input('work_email');
-                    $homePhone = $request->input('home_phone');
-                    $workPhone = $request->input('work_phone');
-                    $cellPhone = $request->input('cell_phone');
-                    $homeAddressLabel = $request->input('home_address_label');
-                    $homeAddressStreet = $request->input('home_address_street');
-                    $homeAddressCity = $request->input('home_address_city');
-                    $homeAddressState = $request->input('home_address_state');
-                    $homeAddressZip = $request->input('home_address_zip');
-                    $homeAddressCountry = $request->input('home_address_country');
-                    $workAddressLabel = $request->input('work_address_label');
-                    $workAddressStreet = $request->input('work_address_street');
-                    $workAddressCity = $request->input('work_address_city');
-                    $workAddressState = $request->input('work_address_state');
-                    $workAddressZip = $request->input('work_address_zip');
-                    $workAddressCountry = $request->input('work_address_country');
-    
-                    // Create an array with all the input fields
-                    $data = [
-                        'prefix' => $request->input('prefix'),
-                        'first_name' => $request->input('first_name'),
-                        'middle_name' => $request->input('middle_name'),
-                        'last_name' => $request->input('last_name'),
-                        'suffix' => $request->input('suffix'),
-                        'nickname' => $request->input('nickname'),
-                        'organization' => $request->input('organization'),
-                        'vtitle' => $request->input('vtitle'),
-                        'role' => $request->input('role'),
-                        'work_url' => $request->input('work_url'),
-                        'email' => $request->input('email'),
-                        'work_email' => $request->input('work_email'),
-                        'home_phone' => $request->input('home_phone'),
-                        'work_phone' => $request->input('work_phone'),
-                        'cell_phone' => $request->input('cell_phone'),
-                        'home_address_label' => $request->input('home_address_label'),
-                        'home_address_street' => $request->input('home_address_street'),
-                        'home_address_city' => $request->input('home_address_city'),
-                        'home_address_state' => $request->input('home_address_state'),
-                        'home_address_zip' => $request->input('home_address_zip'),
-                        'home_address_country' => $request->input('home_address_country'),
-                        'work_address_label' => $request->input('work_address_label'),
-                        'work_address_street' => $request->input('work_address_street'),
-                        'work_address_city' => $request->input('work_address_city'),
-                        'work_address_state' => $request->input('work_address_state'),
-                        'work_address_zip' => $request->input('work_address_zip'),
-                        'work_address_country' => $request->input('work_address_country'),
-                    ];
-                    
-                    // Convert the array to JSON format
-                    $json = json_encode($data);
-                    
-                    // Set the JSON as the variable $links->link, or null if the JSON is empty
-                    $LinkURL = $json ? $json : null;        
-
-                    $OrigLink->update([
-                        'link' => $LinkURL,
-                        'button_id' => 96,
-                        'title' => $LinkTitle,
-                    ]);
-                }else{
-                    $OrigLink->update([
-                        'link' => $LinkURL,
-                        'title' => $LinkTitle,
-                        'button_id' => $button?->id,
-                    ]);
-                }
-                
-            $message .="updated";
-
+            $currentValues = $OrigLink->getAttributes();
+            $nonNullFilteredLinkData = array_filter($filteredLinkData, function($value) {return !is_null($value);});
+            $updatedValues = array_merge($currentValues, $nonNullFilteredLinkData);
+            $OrigLink->update($updatedValues);
+            $message = "Link updated";
         } else {
-            // ADDING NEW
-
-            $isCustomWebsite = $customParams['GetSiteIcon'] ?? null;
-            $SpacerHeight = $customParams['height'] ?? null;
-            
-            $links = new Link;
-            $links->link = $LinkURL;
-            $links->user_id = $userId;
-            if($linkType->typename == "spacer"){
-            $links->title = $SpacerHeight;
-            }else{
-            $links->title = $LinkTitle;
-            }
-            if($linkType->typename == "link" and $isCustomWebsite == "1"){
-                $links->button_id = "2";
-            }elseif($linkType->typename == "link"){
-                $links->button_id = "1";
-            }elseif($linkType->typename == "spacer"){
-                $links->button_id = "43";
-            }elseif($linkType->typename == "heading"){
-                $links->button_id = "42";
-            }elseif($linkType->typename == "text"){
-                $links->button_id = "93";
-                $links->title = $request->text;
-            }elseif($linkType->typename == "email"){
-                $links->link = "mailto:".$links->link;
-                $links->button_id = $button?->id;
-            }elseif($linkType->typename == "telephone"){
-                $links->link = "tel:".$links->link;
-                $links->button_id = $button?->id;
-            }elseif($linkType->typename == "vcard"){
-
-                $prefix = $request->input('prefix');
-                $firstName = $request->input('first_name');
-                $middleName = $request->input('middle_name');
-                $lastName = $request->input('last_name');
-                $suffix = $request->input('suffix');
-                $nickname = $request->input('nickname');
-                $organization = $request->input('organization');
-                $vtitle = $request->input('vtitle');
-                $role = $request->input('role');
-                $workUrl = $request->input('work_url');
-                $email = $request->input('email');
-                $workEmail = $request->input('work_email');
-                $homePhone = $request->input('home_phone');
-                $workPhone = $request->input('work_phone');
-                $cellPhone = $request->input('cell_phone');
-                $homeAddressLabel = $request->input('home_address_label');
-                $homeAddressStreet = $request->input('home_address_street');
-                $homeAddressCity = $request->input('home_address_city');
-                $homeAddressState = $request->input('home_address_state');
-                $homeAddressZip = $request->input('home_address_zip');
-                $homeAddressCountry = $request->input('home_address_country');
-                $workAddressLabel = $request->input('work_address_label');
-                $workAddressStreet = $request->input('work_address_street');
-                $workAddressCity = $request->input('work_address_city');
-                $workAddressState = $request->input('work_address_state');
-                $workAddressZip = $request->input('work_address_zip');
-                $workAddressCountry = $request->input('work_address_country');
-
-                // Create an array with all the input fields
-                $data = [
-                    'prefix' => $request->input('prefix'),
-                    'first_name' => $request->input('first_name'),
-                    'middle_name' => $request->input('middle_name'),
-                    'last_name' => $request->input('last_name'),
-                    'suffix' => $request->input('suffix'),
-                    'nickname' => $request->input('nickname'),
-                    'organization' => $request->input('organization'),
-                    'vtitle' => $request->input('vtitle'),
-                    'role' => $request->input('role'),
-                    'work_url' => $request->input('work_url'),
-                    'email' => $request->input('email'),
-                    'work_email' => $request->input('work_email'),
-                    'home_phone' => $request->input('home_phone'),
-                    'work_phone' => $request->input('work_phone'),
-                    'cell_phone' => $request->input('cell_phone'),
-                    'home_address_label' => $request->input('home_address_label'),
-                    'home_address_street' => $request->input('home_address_street'),
-                    'home_address_city' => $request->input('home_address_city'),
-                    'home_address_state' => $request->input('home_address_state'),
-                    'home_address_zip' => $request->input('home_address_zip'),
-                    'home_address_country' => $request->input('home_address_country'),
-                    'work_address_label' => $request->input('work_address_label'),
-                    'work_address_street' => $request->input('work_address_street'),
-                    'work_address_city' => $request->input('work_address_city'),
-                    'work_address_state' => $request->input('work_address_state'),
-                    'work_address_zip' => $request->input('work_address_zip'),
-                    'work_address_country' => $request->input('work_address_country'),
-                ];
-                
-                // Convert the array to JSON format
-                $json = json_encode($data);
-                
-                // Set the JSON as the variable $links->link, or null if the JSON is empty
-                $links->link = $json ? $json : null;               
-
-                $links->button_id = 96;
-            }else{
-                $links->button_id = $button?->id;
-            }
-
-            $links->save();
-
-            $links->order = ($links->id - 1);
-            $links->save();
-            $message .= "added";
+            $link = new Link($filteredLinkData);
+            $link->user_id = $userId;
+            $link->save();
+            $message = "Link added";
         }
 
-            if ($request->input('param') == 'add_more') {
-                return Redirect('studio/add-link')
-                ->with('success', $message);
-            } else {
-                return Redirect('studio/links')
-                ->with('success', $message);
-            }
-
+        // Step 8: Redirect
+        $redirectUrl = $request->input('param') == 'add_more' ? 'studio/add-link' : 'studio/links';
+        return Redirect($redirectUrl)->with('success', $message);
     }
-
+    
     public function sortLinks(Request $request)
     {
         $linkOrders  = $request->input("linkOrders", []);
@@ -494,8 +352,23 @@ class UserController extends Controller
     public function clickNumber(request $request)
     {
         $linkId = $request->id;
+
+        if (substr($linkId, -1) == '+') {
+            $linkWithoutPlus = str_replace('+', '', $linkId);
+            return redirect(url('info/'.$linkWithoutPlus));
+        }
+    
         $link = Link::find($linkId);
+
+        if (empty($link)) {
+            return abort(404);
+        }
+
         $link = $link->link;
+
+        if (empty($linkId)) {
+            return abort(404);
+        }
 
         Link::where('id', $linkId)->increment('click_number', 1);
 
@@ -560,7 +433,7 @@ class UserController extends Controller
         $userId = Auth::user()->id;
         $data['pagePage'] = 10;
         
-        $data['links'] = Link::select('id', 'link', 'title', 'order', 'click_number', 'up_link', 'links.button_id')->where('user_id', $userId)->orderBy('up_link', 'asc')->orderBy('order', 'asc')->paginate(99999);
+        $data['links'] = Link::select()->where('user_id', $userId)->orderBy('up_link', 'asc')->orderBy('order', 'asc')->paginate(99999);
         return view('studio/links', $data);
     }
 
@@ -655,7 +528,7 @@ class UserController extends Controller
     public function editLink(request $request)
     {
         $request->validate([
-            'link' => 'required',
+            'link' => 'required|exturl',
             'title' => 'required',
             'button' => 'required',
         ]);
@@ -708,91 +581,142 @@ class UserController extends Controller
     }
 
     //Save littlelink page (name, description, logo)
-    public function editPage(request $request)
+    public function editPage(Request $request)
     {
-        $request->validate([
-            'littlelink_name' => 'sometimes|max:255|string|isunique:users,id,'.Auth::id(),
-            'name' => 'sometimes|max:255|string',
-        ]);
-
         $userId = Auth::user()->id;
         $littlelink_name = Auth::user()->littlelink_name;
-
+    
+        $validator = Validator::make($request->all(), [
+            'littlelink_name' => [
+                'sometimes',
+                'max:255',
+                'string',
+                'isunique:users,id,'.$userId,
+            ],
+            'name' => 'sometimes|max:255|string',
+            'image' => 'sometimes|image|mimes:jpeg,jpg,png,webp|max:2048', // Max file size: 2MB
+        ], [
+            'littlelink_name.unique' => __('messages.That handle has already been taken'),
+            'image.image' => __('messages.The selected file must be an image'),
+            'image.mimes' => __('messages.The image must be') . ' JPEG, JPG, PNG, webP.',
+            'image.max' => __('messages.The image size should not exceed 2MB'),
+        ]);
+    
+        if ($validator->fails()) {
+            return redirect('/studio/page')->withErrors($validator)->withInput();
+        }
+    
         $profilePhoto = $request->file('image');
         $pageName = $request->littlelink_name;
-        $pageDescription = strip_tags($request->pageDescription,'<a><p><strong><i><ul><ol><li><blockquote><h2><h3><h4>');
+        $pageDescription = strip_tags($request->pageDescription, '<a><p><strong><i><ul><ol><li><blockquote><h2><h3><h4>');
         $pageDescription = preg_replace("/<a([^>]*)>/i", "<a $1 rel=\"noopener noreferrer nofollow\">", $pageDescription);
+        $pageDescription = strip_tags_except_allowed_protocols($pageDescription);
         $name = $request->name;
         $checkmark = $request->checkmark;
         $sharebtn = $request->sharebtn;
+        $tablinks = $request->tablinks;
 
-        User::where('id', $userId)->update(['littlelink_name' => $pageName, 'littlelink_description' => $pageDescription, 'name' => $name]);
-
-        if ($request->hasFile('image')) {
-            $profilePhoto->move(base_path('assets/img'), $userId . ".png");
+        if(env('HOME_URL') !== '' && $pageName != $littlelink_name && $littlelink_name == env('HOME_URL')){
+            EnvEditor::editKey('HOME_URL', $pageName);
         }
+    
+        User::where('id', $userId)->update([
+            'littlelink_name' => $pageName,
+            'littlelink_description' => $pageDescription,
+            'name' => $name
+        ]);
+    
+        if ($request->hasFile('image')) {
 
-        if($checkmark == "on"){
+            // Delete the user's current avatar if it exists
+            while (findAvatar($userId) !== "error.error") {
+                $avatarName = findAvatar($userId);
+                unlink(base_path($avatarName));
+            }
+            
+            $fileName = $userId . '_' . time() . "." . $profilePhoto->extension();
+            $profilePhoto->move(base_path('assets/img'), $fileName);
+        }
+    
+        if ($checkmark == "on") {
             UserData::saveData($userId, 'checkmark', true);
         } else {
             UserData::saveData($userId, 'checkmark', false);
         }
-
-        if($sharebtn == "on"){
+    
+        if ($sharebtn == "on") {
             UserData::saveData($userId, 'disable-sharebtn', false);
         } else {
             UserData::saveData($userId, 'disable-sharebtn', true);
         }
 
+        if ($tablinks == "on") {
+            UserData::saveData($userId, 'links-new-tab', true);
+        } else {
+            UserData::saveData($userId, 'links-new-tab', false);
+        }
+    
         return Redirect('/studio/page');
     }
 
     //Upload custom theme background image
-    public function themeBackground(request $request)
+    public function themeBackground(Request $request)
     {
-
         $userId = Auth::user()->id;
         $littlelink_name = Auth::user()->littlelink_name;
-
+    
+        $request->validate([
+            'image' => 'required|image|mimes:jpeg,jpg,png,webp,gif|max:2048', // Max file size: 2MB
+        ], [
+            'image.required' => __('messages.Please select an image'),
+            'image.image' => __('messages.The selected file must be an image'),
+            'image.mimes' => __('messages.The image must be') . ' JPEG, JPG, PNG, webP, GIF.',
+            'image.max' => __('messages.The image size should not exceed 2MB'),
+        ]);
+    
         $customBackground = $request->file('image');
-
-        if (!empty($customBackground)) {
+    
+        if ($customBackground) {
             $directory = base_path('assets/img/background-img/');
             $files = scandir($directory);
             $pathinfo = "error.error";
-            foreach($files as $file) {
-            if (strpos($file, $userId.'.') !== false) {
-            $pathinfo = $userId. "." . pathinfo($file, PATHINFO_EXTENSION);
-            }}
-            if(file_exists(base_path('assets/img/background-img/').$pathinfo)){File::delete(base_path('assets/img/background-img/').$pathinfo);}
-
-            $customBackground->move(base_path('assets/img/background-img/'), $userId.".".$request->file('image')->extension());
+            foreach ($files as $file) {
+                if (strpos($file, $userId . '.') !== false) {
+                    $pathinfo = $userId . "." . pathinfo($file, PATHINFO_EXTENSION);
+                }
+            }
+    
+            // Delete the user's current background image if it exists
+            while (findBackground($userId) !== "error.error") {
+                $avatarName = "assets/img/background-img/" . findBackground(Auth::id());
+                unlink(base_path($avatarName));
+            }
+                
+            $fileName = $userId . '_' . time() . "." . $customBackground->extension();
+            $customBackground->move(base_path('assets/img/background-img/'), $fileName);
+    
+            if (extension_loaded('imagick')) {
+                $imagePath = base_path('assets/img/background-img/') . $fileName;
+                $image = new \Imagick($imagePath);
+                $image->stripImage();
+                $image->writeImage($imagePath);
+            }
+    
+            return redirect('/studio/theme');
         }
-
-        return Redirect('/studio/theme');
+    
+        return redirect('/studio/theme')->with('error', 'Please select a valid image file.');
     }
 
     //Delete custom background image
     public function removeBackground()
     {
+        $userId = Auth::user()->id;
 
-        function findBackground($name){
-            $directory = base_path('assets/img/background-img/');
-            $files = scandir($directory);
-            $pathinfo = "error.error";
-            foreach($files as $file) {
-            if (strpos($file, $name.'.') !== false) {
-            $pathinfo = $name. "." . pathinfo($file, PATHINFO_EXTENSION);
-            }}
-            return $pathinfo;
-        }
-
-        $user_id = Auth::user()->id;
-        $path = findBackground($user_id);
-        $path = base_path('assets/img/background-img/'.$path);
-        
-        if (File::exists($path)) {
-            File::delete($path);
+        // Delete the user's current background image if it exists
+        while (findBackground($userId) !== "error.error") {
+            $avatarName = "assets/img/background-img/" . findBackground(Auth::id());
+            unlink(base_path($avatarName));
         }
 
         return back();
@@ -827,36 +751,48 @@ class UserController extends Controller
 
 
 
-        if (!empty($zipfile)) {
+        if (!empty($zipfile) && Auth::user()->role == 'admin') {
 
-            $zipfile->move(base_path('/themes'), "temp.zip");
+            $themesPath = base_path('themes');
+            $tmpPath = base_path() . '/themes/temp.zip';
+            $zipfile->move($themesPath, "temp.zip");
 
             $zip = new ZipArchive;
-            $zip->open(base_path() . '/themes/temp.zip');
-            $zip->extractTo(base_path() . '/themes');
+            $zip->open($tmpPath);
+            $zip->extractTo($themesPath);
             $zip->close();
-            unlink(base_path() . '/themes/temp.zip');
+            unlink($tmpPath);
 
             // Removes version numbers from folder.
 
-            $folder = base_path('themes');
             $regex = '/[0-9.-]/';
-            $files = scandir($folder);
+            $files = scandir($themesPath);
+            $files = array_diff($files, array('.', '..'));
 
             foreach ($files as $file) {
-                if ($file !== '.' && $file !== '..') {
-                    if (preg_match($regex, $file)) {
-                        $new_file = preg_replace($regex, '', $file);
-                        File::copyDirectory($folder . '/' . $file, $folder . '/' . $new_file);
-                        $dirname = $folder . '/' . $file;
-                        if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
-                            system('rmdir ' . escapeshellarg($dirname) . ' /s /q');
-                        } else {
-                            system("rm -rf " . escapeshellarg($dirname));
-                        }
-                    }
+
+                $basename = basename($file);
+                $filePath = $themesPath . '/' . $basename;
+
+                if (!is_dir($filePath)) {
+                        
+                    try {
+                        File::delete($filePath);
+                    } catch (exception $e) {}
+
                 }
+
+                if (preg_match($regex, $basename)) {
+
+                    $newBasename = preg_replace($regex, '', $basename);
+                    $newPath = $themesPath . '/' . $newBasename;
+                    File::copyDirectory($filePath, $newPath);
+                    File::deleteDirectory($filePath);
+
+                }
+
             }
+
         }
 
 
@@ -894,6 +830,7 @@ class UserController extends Controller
             User::where('id', $userId)->update(['email' => $email]);
         } elseif ($request->password != '') {
             User::where('id', $userId)->update(['password' => $password]);
+            Auth::logout();
         }
         return back();
     }
@@ -926,6 +863,9 @@ class UserController extends Controller
         $id = $request->id;
 
     if($id == Auth::id() and $id != "1") {
+
+        Link::where('user_id', $id)->delete();
+
         $user = User::find($id);
 
         Schema::disableForeignKeyConstraints();
@@ -939,11 +879,12 @@ class UserController extends Controller
     //Delete profile picture
     public function delProfilePicture()
     {
-        $user_id = Auth::user()->id;
-        $path = base_path(findAvatar($user_id));
-        
-        if (File::exists($path)) {
-            File::delete($path);
+        $userId = Auth::user()->id;
+
+        // Delete the user's current avatar if it exists
+        while (findAvatar($userId) !== "error.error") {
+            $avatarName = findAvatar($userId);
+            unlink(base_path($avatarName));
         }
 
         return back();
@@ -989,17 +930,6 @@ class UserController extends Controller
     
         $userData = $user->toArray();
         $userData['links'] = $links->toArray();
-    
-        function findAvatar($name){
-            $directory = base_path('assets/img');
-            $files = scandir($directory);
-            $pathinfo = "error.error";
-            foreach($files as $file) {
-            if (strpos($file, $name.'.') !== false) {
-            $pathinfo = "/img/" . $name. "." . pathinfo($file, PATHINFO_EXTENSION);
-            }}
-            return $pathinfo;
-          }
 
         if (file_exists(base_path(findAvatar($userId)))){
             $imagePath = base_path(findAvatar($userId));
@@ -1038,23 +968,39 @@ class UserController extends Controller
             if (isset($userData['name'])) {
                 $user->name = $userData['name'];
             }
-            if (isset($userData['littlelink_name'])) {
-                $user->littlelink_name = $userData['littlelink_name'];
-            }
+
             if (isset($userData['littlelink_description'])) {
-                $user->littlelink_description = $userData['littlelink_description'];
+                $sanitizedText = $userData['littlelink_description'];
+                $sanitizedText = strip_tags($sanitizedText, '<a><p><strong><i><ul><ol><li><blockquote><h2><h3><h4>');
+                $sanitizedText = preg_replace("/<a([^>]*)>/i", "<a $1 rel=\"noopener noreferrer nofollow\">", $sanitizedText);
+                $sanitizedText = strip_tags_except_allowed_protocols($sanitizedText);
+                $user->littlelink_description = $sanitizedText;
             }
+
             if (isset($userData['image_data'])) {
+
+                $allowedExtensions = array('jpeg', 'jpg', 'png', 'webp');
+                $userExtension = strtolower($userData['image_extension']);
+
+                if (in_array($userExtension, $allowedExtensions)) {
                 // Decode the image data from Base64
                 $imageData = base64_decode($userData['image_data']);
+
+                // Delete the user's current avatar if it exists
+                while (findAvatar(Auth::id()) !== "error.error") {
+                    $avatarName = findAvatar(Auth::id());
+                    unlink(base_path($avatarName));
+                }
                 
                 // Save the image to the correct path with the correct file name and extension
-                $filename = $user->id . '.' . $userData['image_extension'];
-                file_put_contents(base_path('img/' . $filename), $imageData);
+                $filename = $user->id . '.' . $userExtension;
+                file_put_contents(base_path('assets/img/' . $filename), $imageData);
                 
                 // Update the user's image field with the correct file name
                 $user->image = $filename;
+                }
             }
+
             $user->save();
     
             // Delete all links for the authenticated user
@@ -1062,17 +1008,39 @@ class UserController extends Controller
     
             // Loop through each link in $userData and create a new link for the user
             foreach ($userData['links'] as $linkData) {
+
+                $validatedData = Validator::make($linkData, [
+                    'link' => 'nullable|exturl',
+                ]);
+
+                if ($validatedData->fails()) {
+                    throw new \Exception('Invalid link');
+                }
+
                 $newLink = new Link();
     
                 // Copy over the link data from $linkData to $newLink
                 $newLink->button_id = $linkData['button_id'];
                 $newLink->link = $linkData['link'];
-                $newLink->title = $linkData['title'];
+                
+                // Sanitize the title
+                if ($linkData['button_id'] == 93) {
+                    $sanitizedText = strip_tags($linkData['title'], '<a><p><strong><i><ul><ol><li><blockquote><h2><h3><h4>');
+                    $sanitizedText = preg_replace("/<a([^>]*)>/i", "<a $1 rel=\"noopener noreferrer nofollow\">", $sanitizedText);
+                    $sanitizedText = strip_tags_except_allowed_protocols($sanitizedText);
+                
+                    $newLink->title = $sanitizedText;
+                } else {
+                    $newLink->title = $linkData['title'];
+                }
+
                 $newLink->order = $linkData['order'];
-                $newLink->click_number = $linkData['click_number'];
+                $newLink->click_number = 0;
                 $newLink->up_link = $linkData['up_link'];
                 $newLink->custom_css = $linkData['custom_css'];
                 $newLink->custom_icon = $linkData['custom_icon'];
+                $newLink->type = $linkData['type'];
+                $newLink->type_params = $linkData['type_params'];
     
                 // Set the user ID to the current user's ID
                 $newLink->user_id = $user->id;
@@ -1080,7 +1048,6 @@ class UserController extends Controller
                 // Save the new link to the database
                 $newLink->save();
             }
-    
             return redirect('studio/profile')->with('success', __('messages.Profile updated successfully!'));
         } catch (\Exception $e) {
             return redirect('studio/profile')->with('error', __('messages.An error occurred while updating your profile.'));
@@ -1088,26 +1055,61 @@ class UserController extends Controller
     }
     
 
-    //Edit/save page icons
-    public function editIcons(request $request)
+    // Hanle reports
+    function report(Request $request)
     {
+        $formData = $request->all();
+    
+        try {
+            Mail::to(env('ADMIN_EMAIL'))->send(new ReportSubmissionMail($formData));
+            
+            return redirect('report')->with('success', __('messages.report_success'));
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', __('messages.report_error'));
+        }
+    }
 
-        function searchIcon($icon)
-        {
-            $iconId = DB::table('links')
+    //Edit/save page icons
+    public function editIcons(Request $request)
+    {
+        $inputKeys = array_keys($request->except('_token'));
+
+        $validationRules = [];
+
+        foreach ($inputKeys as $platform) {
+            $validationRules[$platform] = 'nullable|exturl|max:255';
+        }
+
+        $request->validate($validationRules);
+
+        foreach ($inputKeys as $platform) {
+            $link = $request->input($platform);
+
+            if (!empty($link)) {
+                $iconId = $this->searchIcon($platform);
+
+                if (!is_null($iconId)) {
+                    $this->updateIcon($platform, $link);
+                } else {
+                    $this->addIcon($platform, $link);
+                }
+            }
+        }
+
+        return redirect('studio/links#icons');
+    }
+
+    private function searchIcon($icon)
+    {
+        return DB::table('links')
             ->where('user_id', Auth::id())
             ->where('title', $icon)
             ->where('button_id', 94)
             ->value('id');
-        
-        if (is_null($iconId)){
-            return false;
-        } else {
-            return $iconId;
-        }
-        }
+    }
 
-        function addIcon($icon, $link){
+    private function addIcon($icon, $link)
+    {
         $userId = Auth::user()->id;
         $links = new Link;
         $links->link = $link;
@@ -1119,61 +1121,12 @@ class UserController extends Controller
         $links->save();
     }
 
-        function updateIcon($icon, $link){
-        Link::where('id', searchIcon($icon))->update([
+    private function updateIcon($icon, $link)
+    {
+        Link::where('id', $this->searchIcon($icon))->update([
             'button_id' => 94,
             'link' => $link,
             'title' => $icon
         ]);
     }
-
-    function saveIcon($icon, $link){
-    if(isset($link)){
-        if(searchIcon($icon) != NULL){
-            updateIcon($icon, $link);
-        }else{
-            addIcon($icon, $link);}
-    }   
-}
-
-
-
-
-    saveIcon('mastodon', $request->mastodon);
-
-    saveIcon('instagram', $request->instagram);
-
-    saveIcon('twitter', $request->twitter);
-
-    saveIcon('facebook', $request->facebook);
-
-    saveIcon('github', $request->github);
-
-    saveIcon('linkedin', $request->linkedin);
-
-    saveIcon('tiktok', $request->tiktok);
-
-    saveIcon('discord', $request->discord);
-
-    saveIcon('youtube', $request->youtube);
-
-    saveIcon('snapchat', $request->snapchat);
-
-    saveIcon('reddit', $request->reddit);
-
-    saveIcon('pinterest', $request->pinterest);
-
-    saveIcon('telegram', $request->telegram);
-
-    saveIcon('whatsapp', $request->whatsapp);
-
-    saveIcon('twitch', $request->twitch);
-
-
-
-
-        return Redirect('studio/links#icons');
-
-    }
-
 }

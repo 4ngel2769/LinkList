@@ -27,6 +27,7 @@ use App\Models\Admin;
 use App\Models\Button;
 use App\Models\Link;
 use App\Models\Page;
+use App\Models\UserData;
 
 class AdminController extends Controller
 {
@@ -72,55 +73,12 @@ class AdminController extends Controller
         return view('panel/index', ['lastMonthCount' => $lastMonthCount,'lastWeekCount' => $lastWeekCount,'last24HrsCount' => $last24HrsCount,'updatedLast30DaysCount' => $updatedLast30DaysCount,'updatedLast7DaysCount' => $updatedLast7DaysCount,'updatedLast24HrsCount' => $updatedLast24HrsCount,'toplinks' => $topLinks, 'links' => $links, 'clicks' => $clicks, 'pageStats' => $pageStats, 'littlelink_name' => $littlelink_name, 'links' => $links, 'clicks' => $clicks, 'siteLinks' => $siteLinks, 'siteClicks' => $siteClicks, 'userNumber' => $userNumber]);
     }
 
-// Get users by type
-public function users(Request $request)
+// Users page
+public function users()
 {
-    $usersType = $request->type;
-
-    switch ($usersType) {
-        case 'all':
-            $users = User::select('id', 'name', 'email', 'littlelink_name', 'role', 'block', 'email_verified_at', 'created_at', 'updated_at')->get();
-            break;
-        case 'user':
-            $users = User::where('role', 'user')->select('id', 'email', 'name', 'littlelink_name', 'role', 'block', 'email_verified_at', 'created_at', 'updated_at')->get();
-            break;
-        case 'vip':
-            $users = User::where('role', 'vip')->select('id', 'email', 'name', 'littlelink_name', 'role', 'block', 'email_verified_at', 'created_at', 'updated_at')->get();
-            break;
-        case 'admin':
-            $users = User::where('role', 'admin')->select('id', 'email', 'name', 'littlelink_name', 'role', 'block', 'email_verified_at', 'created_at', 'updated_at')->get();
-            break;
-    }
-
-    $data['users'] = $users;
-
-    // Loop through each user to get their click count and link count
-    foreach ($users as $user) {
-        $clicks = Link::where('user_id', $user->id)->sum('click_number');
-        $links = Link::where('user_id', $user->id)->select('link')->count();
-        $user->clicks = $clicks;
-        $user->links = $links;
-    }
-
-    return view('panel/users', $data);
+    return view('panel/users');
 }
 
-
-    //Search user by name
-    public function searchUser(Request $request)
-    {
-        $searchTerm = $request->search;
-        $data['users'] = User::where('name', 'like', "%{$searchTerm}%")
-                              ->orWhere('email', 'like', "%{$searchTerm}%")
-                              ->orWhere('littlelink_name', 'like', "%{$searchTerm}%")
-                            //   ->orWhere('role', 'like', "%{$searchTerm}%")
-                            //   ->orWhere('block', 'like', "%{$searchTerm}%")
-                            //   ->orWhere('email_verified_at', 'like', "%{$searchTerm}%")
-                              ->select('id', 'email', 'name', 'littlelink_name', 'role', 'block', 'email_verified_at', 'created_at', 'updated_at')
-                              ->get();
-        return view('panel/users', $data);
-    }
-    
 // Send test mail
 public function SendTestMail(Request $request)
 {
@@ -156,21 +114,37 @@ public function SendTestMail(Request $request)
         return redirect('admin/users/all');
     }
 
+    //Verify user
+    public function verifyCheckUser(request $request)
+    {
+        $id = $request->id;
+        $status = $request->verify;
+
+        if ($status == 'vip') {
+            $verify = 'vip';
+            UserData::saveData($id, 'checkmark', true);
+        } elseif ($status == 'user') {
+            $verify = 'user';
+        }
+
+        User::where('id', $id)->update(['role' => $verify]);
+
+        return redirect(url('u')."/".$id);
+    }
+
     //Verify or un-verify users emails
     public function verifyUser(request $request)
     {
         $id = $request->id;
         $status = $request->verify;
 
-        if ($status == '-') {
+        if ($status == "true") {
             $verify = '0000-00-00 00:00:00';
         } else {
             $verify = NULL;
         }
 
         User::where('id', $id)->update(['email_verified_at' => $verify]);
-
-        return redirect('admin/users/all');
     }
 
     //Create new user from the Admin Panel
@@ -192,9 +166,25 @@ public function SendTestMail(Request $request)
             return implode('', $pieces);
         }
 
+        $names = User::pluck('name')->toArray();
+
+        $adminCreatedNames = array_filter($names, function($name) {
+            return strpos($name, 'Admin-Created-') === 0;
+        });
+
+        $numbers = array_map(function($name) {
+            return (int) str_replace('Admin-Created-', '', $name);
+        }, $adminCreatedNames);
+
+        $maxNumber = !empty($numbers) ? max($numbers) : 0;
+        $newNumber = $maxNumber + 1;
+
+        $domain = parse_url(url(''), PHP_URL_HOST);
+        $domain = ($domain == 'localhost') ? 'example.com' : $domain;
+
         $user = User::create([
-            'name' => 'Admin-Created-' . random_str(8),
-            'email' => random_str(8) . '@example.com',
+            'name' => 'Admin-Created-' . $newNumber,
+            'email' => strtolower(random_str(8)) . '@' . $domain,
             'password' => Hash::make(random_str(32)),
             'role' => 'user',
             'block' => 'no',
@@ -208,13 +198,31 @@ public function SendTestMail(Request $request)
     {
         $id = $request->id;
 
-        $user = User::find($id);
-
+        Link::where('user_id', $id)->delete();
+    
         Schema::disableForeignKeyConstraints();
+        
+        $user = User::find($id);
         $user->forceDelete();
+    
         Schema::enableForeignKeyConstraints();
-
+    
         return redirect('admin/users/all');
+    }
+
+    //Delete existing user with POST request
+    public function deleteTableUser(request $request)
+    {
+        $id = $request->id;
+
+        Link::where('user_id', $id)->delete();
+    
+        Schema::disableForeignKeyConstraints();
+        
+        $user = User::find($id);
+        $user->forceDelete();
+    
+        Schema::enableForeignKeyConstraints();
     }
 
     //Show user to edit
@@ -267,14 +275,21 @@ public function SendTestMail(Request $request)
         $littlelink_description = $request->littlelink_description;
         $role = $request->role;
         $customBackground = $request->file('background');
+        $theme = $request->theme;
+
+        if(User::where('id', $id)->get('role')->first()->role =! $role) {
+            if ($role == 'vip') {
+                UserData::saveData($id, 'checkmark', true);
+            }
+        }
 
         if ($request->password == '') {
-            User::where('id', $id)->update(['name' => $name, 'email' => $email, 'littlelink_name' => $littlelink_name, 'littlelink_description' => $littlelink_description, 'role' => $role]);
+            User::where('id', $id)->update(['name' => $name, 'email' => $email, 'littlelink_name' => $littlelink_name, 'littlelink_description' => $littlelink_description, 'role' => $role, 'theme' => $theme]);
         } else {
-            User::where('id', $id)->update(['name' => $name, 'email' => $email, 'password' => $password, 'littlelink_name' => $littlelink_name, 'littlelink_description' => $littlelink_description, 'role' => $role]);
+            User::where('id', $id)->update(['name' => $name, 'email' => $email, 'password' => $password, 'littlelink_name' => $littlelink_name, 'littlelink_description' => $littlelink_description, 'role' => $role, 'theme' => $theme]);
         }
         if (!empty($profilePhoto)) {
-            $profilePhoto->move(base_path('assets/img'), $id . ".png");
+            $profilePhoto->move(base_path('assets/img'), $id . '_' . time() . ".png");
         } 
         if (!empty($customBackground)) {
             $directory = base_path('assets/img/background-img/');
@@ -286,7 +301,7 @@ public function SendTestMail(Request $request)
             }}
             if(file_exists(base_path('assets/img/background-img/').$pathinfo)){File::delete(base_path('assets/img/background-img/').$pathinfo);}
     
-            $customBackground->move(base_path('assets/img/background-img/'), $id.".".$request->file('background')->extension());
+            $customBackground->move(base_path('assets/img/background-img/'), $id . '_' . time() . "." . $request->file('background')->extension());
         } 
 
         return redirect('admin/users/all');
@@ -330,30 +345,28 @@ public function SendTestMail(Request $request)
 
         if (!empty($logo)) {
             // Delete existing image
-            $directory = base_path('/assets/linkstack/images/');
-            $files = scandir($directory);
-            $pathinfo = "error.error";
-            foreach($files as $file) {
-            if (strpos($file, "avatar".'.') !== false) {
-            $pathinfo = "avatar". "." . pathinfo($file, PATHINFO_EXTENSION);
-            }}
-            if(file_exists(base_path('/assets/linkstack/images/').$pathinfo)){File::delete(base_path('/assets/linkstack/images/').$pathinfo);}
+            $path = findFile('avatar');
+            $path = base_path('/assets/linkstack/images/'.$path);
+    
+                // Delete existing image
+                if (File::exists($path)) {
+                    File::delete($path);
+                }
 
-            $logo->move(base_path('/assets/linkstack/images/'), "avatar.".$request->file('image')->extension());
+            $logo->move(base_path('/assets/linkstack/images/'), "avatar" . '_' . time() . "." .$request->file('image')->extension());
         }
 
         if (!empty($icon)) {
             // Delete existing image
-            $directory = base_path('/assets/linkstack/images/');
-            $files = scandir($directory);
-            $pathinfo = "error.error";
-            foreach($files as $file) {
-            if (strpos($file, "favicon".'.') !== false) {
-            $pathinfo = "favicon". "." . pathinfo($file, PATHINFO_EXTENSION);
-            }}
-            if(file_exists(base_path('/assets/linkstack/images/').$pathinfo)){File::delete(base_path('/assets/linkstack/images/').$pathinfo);}
+            $path = findFile('favicon');
+            $path = base_path('/assets/linkstack/images/'.$path);
+    
+                // Delete existing image
+                if (File::exists($path)) {
+                    File::delete($path);
+                }
 
-            $icon->move(base_path('/assets/linkstack/images/'), "favicon.".$request->file('icon')->extension());
+            $icon->move(base_path('/assets/linkstack/images/'), "favicon" . '_' . time() . "." . $request->file('icon')->extension());
         }
         return back();
     }
@@ -361,15 +374,13 @@ public function SendTestMail(Request $request)
     //Delete avatar
     public function delAvatar()
     {
+        $path = findFile('avatar');
+        $path = base_path('/assets/linkstack/images/'.$path);
+
             // Delete existing image
-            $directory = base_path('/assets/linkstack/images/');
-            $files = scandir($directory);
-            $pathinfo = "error.error";
-            foreach($files as $file) {
-            if (strpos($file, "avatar".'.') !== false) {
-            $pathinfo = "avatar". "." . pathinfo($file, PATHINFO_EXTENSION);
-            }}
-            if(file_exists(base_path('/assets/linkstack/images/').$pathinfo)){File::delete(base_path('/assets/linkstack/images/').$pathinfo);}
+            if (File::exists($path)) {
+                File::delete($path);
+            }
         
         return back();
     }
@@ -378,14 +389,13 @@ public function SendTestMail(Request $request)
     public function delFavicon()
     {
             // Delete existing image
-            $directory = base_path('/assets/linkstack/images/');
-            $files = scandir($directory);
-            $pathinfo = "error.error";
-            foreach($files as $file) {
-            if (strpos($file, "favicon".'.') !== false) {
-            $pathinfo = "favicon". "." . pathinfo($file, PATHINFO_EXTENSION);
-            }}
-            if(file_exists(base_path('/assets/linkstack/images/').$pathinfo)){File::delete(base_path('/assets/linkstack/images/').$pathinfo);}
+            $path = findFile('favicon');
+            $path = base_path('/assets/linkstack/images/'.$path);
+    
+                // Delete existing image
+                if (File::exists($path)) {
+                    File::delete($path);
+                }
 
         return back();
     }
@@ -441,15 +451,17 @@ public function SendTestMail(Request $request)
     //Shows config file editor page
     public function showFileEditor(request $request)
     {
-        return view('/panel/config');
+        return redirect('/admin/config');
     }
 
     //Saves advanced config
     public function editAC(request $request)
     {
-        $AdvancedConfig = $request->AdvancedConfig;
-
-        file_put_contents('config/advanced-config.php', $AdvancedConfig);
+        if ($request->ResetAdvancedConfig == 'RESET_DEFAULTS') {
+            copy(base_path('storage/templates/advanced-config.php'), base_path('config/advanced-config.php')); 
+        } else {
+            file_put_contents('config/advanced-config.php', $request->AdvancedConfig);
+        }
 
         return redirect('/admin/config#2');
     }
@@ -665,4 +677,91 @@ public function SendTestMail(Request $request)
     {
         return view('/panel/theme');
     }
+
+    //Removes impersonation if authenticated
+    public function authAs(request $request)
+    {
+
+        $userID = $request->id;
+        $token = $request->token;
+
+        $user = User::find($userID);
+
+        if($user->remember_token == $token && $request->session()->get('display_auth_nav') === $user->remember_token){
+            $user->auth_as = null;
+            $user->remember_token = null;
+            $user->save();
+
+            $request->session()->forget('display_auth_nav');
+
+            Auth::loginUsingId($userID);
+
+        return redirect('/admin/users/all');
+        } else {
+            Auth::logout();
+        }
+
+    }
+
+    //Add impersonation
+    public function authAsID(request $request)
+    {
+
+        $adminUser = User::whereNotNull('auth_as')->where('role', 'admin')->first();
+
+        if (!$adminUser) {
+
+        $userID = $request->id;
+        $id = Auth::user()->id;
+
+        $user = User::find($id);
+
+        $user->auth_as = $userID;
+        $user->save();
+
+        return redirect('dashboard');
+
+        } else {
+            return redirect('admin/users/all');
+        }
+
+    }
+
+    //Show info about link
+    public function redirectInfo(request $request)
+    {
+        $linkId = $request->id;
+
+        if (empty($linkId)) {
+            return abort(404);
+        }
+        
+        $linkData = Link::find($linkId);
+        $clicks = $linkData->click_number;
+
+        if (empty($linkData)) {
+            return abort(404);
+        }
+
+        function isValidLink($url) {
+            $validPrefixes = array('http', 'https', 'ftp', 'mailto', 'tel', 'news');
+        
+            $pattern = '/^(' . implode('|', $validPrefixes) . '):/i';
+        
+            if (preg_match($pattern, $url) && strlen($url) <= 155) {
+                return $url;
+            } else {
+                return "N/A";
+            }
+        }
+
+        $link = isValidLink($linkData->link);
+
+        $userID = $linkData->user_id;
+        $userData = User::find($userID);
+
+        return view('linkinfo', ['clicks' => $clicks, 'linkID' => $linkId, 'link' => $link, 'id' => $userID, 'userData' => $userData]);
+
+    }
+
 }

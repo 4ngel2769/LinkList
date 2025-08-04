@@ -358,6 +358,8 @@ return [
     'disableverified' => 'You are a verified user. This setting allows you to hide your checkmark on your page.',
     'Show share button' => 'Show share button',
     'disablesharebutton' => 'This setting allows you to hide the share button on your page.',
+    'Open links in new tab' => 'Open links in new tab',
+    'openlinksnewtab' => 'This setting determines if your links on your links page get opened in the same or a new tab.',
 
 
     /*
@@ -389,6 +391,12 @@ return [
     'Profile updated successfully!' => 'Profile updated successfully!',
     'An error occurred while updating your profile.' => 'An error occurred while updating your profile.',
 
+    'That handle has already been taken' => 'That handle has already been taken.',
+    'The selected file must be an image' => 'The selected file must be an image.',
+    'The image must be' => 'The image must be:',
+    'The image size should not exceed 2MB' => 'The image size should not exceed 2MB.',
+    'Please select an image' => 'Please select an image.',
+    
 
     /*
     |--------------------------------------------------------------------------
@@ -521,6 +529,7 @@ return [
 
     # Tooltips
     'tt.Delete' => 'Delete',
+    'tt.Impersonate' => 'Impersonate',
     'tt.Edit' => 'Edit',
     'tt.All links' => 'All links',
 
@@ -688,6 +697,8 @@ return [
     'FORCE_HTTPS.description' => 'Makes all links utilize HTTPS by default. It is advised to enable this option if you are using a reverse proxy.',
     'ALLOW_CUSTOM_CODE_IN_THEMES.title' => 'Allow custom code in themes',
     'ALLOW_CUSTOM_CODE_IN_THEMES.description' => 'Allows use of custom code in themes. If you use themes from unknown sources, <br>this may pose a security risk.',
+    'ENABLE_ADMIN_BAR_USERS.title' => 'Enable Admin Bar for all users',
+    'ENABLE_ADMIN_BAR_USERS.description' => 'If enabled users, all authenticated users will have an Admin Bar displayed on their links pages.',
     'ENABLE_THEME_UPDATER.title' => 'Enable Theme Updater',
     'ENABLE_THEME_UPDATER.description' => 'Determines if the theme updater should be active.',
     'ENABLE_SOCIAL_LOGIN.title' => 'Enable social login',
@@ -724,6 +735,8 @@ return [
     'ADMIN_EMAIL.description' => 'Used to send notification emails.',
     'HIDE_VERIFICATION_CHECKMARK.title' => 'Hide verification checkmark',
     'HIDE_VERIFICATION_CHECKMARK.description' => 'Hides verification badge displayed on admin and VIP pages.',
+    'ENABLE_REPORT_ICON.title' => 'Enable report icon',
+    'ENABLE_REPORT_ICON.description' => 'Displays an icon on user pages that allows users to report pages.',
     'LOCALE.title' => 'App locale',
     'LOCALE.description' => 'Change the language of your application',
 
@@ -748,6 +761,8 @@ return [
     'Create the admin user' => '3. Create the admin user',
     'Configure the app' => '4. Configure the app',
     'Choose a language' => 'Choose a language',
+    'setup.disclaimer' => 'By continuing, you agree to abide by our',
+    'Terms and Conditions' => 'Terms and Conditions',
 
     'Next' => 'Next',
     'Yes' => 'Yes',
@@ -963,7 +978,7 @@ return [
     | LinkStack (Links) Page
     |--------------------------------------------------------------------------
     |
-    | resources/views/littlelink.blade.php
+    | resources/views/linkstack/linkstack.blade.php
     |
     */
 
@@ -971,6 +986,13 @@ return [
     'Share' => 'Share',
     'Copy URL to clipboard' => 'Copy URL to clipboard',
     'URL has been copied to your clipboard!' => 'URL has been copied to your clipboard!',
+
+    'Delete User' => 'Delete User',
+    'Block User' => 'Block User',
+    'Users Theme' => 'Theme',
+    'Search User' => 'Search for User',
+    
+    'Edit my profile' => 'Edit my profile',
 
 
     /*
@@ -1032,6 +1054,53 @@ return [
     'footer.Contact' => 'Contact',
 
 
+    /*
+    |--------------------------------------------------------------------------
+    | Report Page
+    |--------------------------------------------------------------------------
+    |
+    */
+
+    'report_violation' => 'Report a Violation',
+    'url_label' => 'URL of the site you are reporting',
+    'report_type_label' => 'Type of report',
+    'hate_speech' => 'Hate Speech or Harassment',
+    'violence_threats' => 'Violence or Threats',
+    'illegal_activities' => 'Illegal Activities',
+    'copyright_infringement' => 'Copyright Infringement',
+    'misinformation_fake_news' => 'Misinformation or Fake News',
+    'identity_theft' => 'Identity Theft',
+    'drug_related_content' => 'Drug-related Content',
+    'weapons_harmful_objects' => 'Weapons or Harmful Objects',
+    'child_exploitation' => 'Child Exploitation',
+    'fraud_scams' => 'Fraud or Scams',
+    'privacy_violation' => 'Privacy Violation',
+    'impersonation' => 'Impersonation',
+    'other_specify' => 'Other (Specify)',
+    'additional_comments_label' => 'Additional comments',
+    'submit_button' => 'Submit',
+    
+
+    'report_mail_admin_subject' => 'Profile Report',
+    'report_mail_admin_report' => 'A Profile has been reported',
+
+    'report_mail_reported_profile' => 'Reported Profile',
+    'report_mail_reported_url' => 'Reported URL',
+    'report_mail_type' => 'Type',
+    'report_mail_message' => 'Message',
+
+    'report_mail_report_submitted_by' => 'Report submitted by',
+    'report_mail_reported_by' => 'Reported by',
+    'report_mail_profile' => 'Profile',
+
+    'report_mail_button_profile' => 'View on Users Page',
+    'report_mail_button_delete' => 'Delete Reported User',
+
+
+    'report_error' => 'Profile could not be reported',
+    'report_success' => 'Profile has been reported successfully',
+
+    
     #=============================================================================#
     # Laravel internal translations                                               #
     #=============================================================================#
